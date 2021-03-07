@@ -1,0 +1,12 @@
+{
+	"name": "basic-type-extensions",
+	"version": "1.1.0",
+	"description": "Some useful extensions for Javascript/Typescript basic types",
+	"main": "index.js",
+	"scripts": {
+		"test": "ts-node test.ts",
+		"build": "tsc -p tsconfig.json"
+	},
+	"author": "true_mogician",
+	"license": "MIT"
+}
