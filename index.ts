@@ -6,7 +6,7 @@ declare global {
 		minimum(...keys: ((obj: T) => any)[]): T;
 		maximum(compareFn?: (a: T, b: T) => number): T;
 		maximum(...keys: ((obj: T) => any)[]): T;
-		sort(...keys: ((obj: T) => any)[]): T[];
+		keySort(...keys: ((obj: T) => any)[]): T[];
 		intersects(array: Array<T>): boolean;
 		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<void>, thisArg?: any): Promise<void>
 	}
@@ -60,21 +60,18 @@ Array.prototype.maximum = function <T>(this: Array<T>, func?: CompareFunction<T>
 	}
 	return result;
 }
-Array.prototype.sort = function <T>(this: Array<T>, func?: CompareFunction<T> | GetKeyFunction<T>, ...keys: GetKeyFunction<T>[]): T[] {
+Array.prototype.keySort = function <T>(this: Array<T>, ...keys: GetKeyFunction<T>[]): T[] {
 	if (!this || this.length < 2)
 		return this;
-	let compare: CompareFunction<T> =
-		(!func || func.length == 2) ?
-			func as CompareFunction<T> :
-			(a, b) => {
-				for (const key of [func as GetKeyFunction<T>, ...keys]) {
-					if (key(a) < key(b))
-						return -1;
-					else if (key(a) > key(b))
-						return 1;
-				}
-				return 0;
-			}
+	let compare: CompareFunction<T> = (a, b) => {
+		for (const key of keys) {
+			if (key(a) < key(b))
+				return -1;
+			else if (key(a) > key(b))
+				return 1;
+		}
+		return 0;
+	}
 	return this.sort(compare);
 }
 Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): boolean {
