@@ -10,6 +10,10 @@ declare global {
 		intersects(array: Array<T>): boolean;
 		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<void>, thisArg?: any): Promise<void>
 	}
+	interface PromiseConstructor {
+		sleep(milliseconds: number): Promise<void>;
+		wait(predict: (...args: any[]) => boolean, timeout: number, maxTimeout?: number, ...args: any[]): Promise<boolean>;
+	}
 }
 type CompareFunction<T> = (a: T, b: T) => number;
 type GetKeyFunction<T> = (obj: T) => any;
@@ -97,4 +101,27 @@ Array.prototype.forEachAsync = async function <T>(this: Array<T>, callbackfn: (v
 				resolve();
 		}, thisArg)
 	})
+}
+Promise.sleep = async function (milliseconds: number): Promise<void> {
+	return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+Promise.wait = async function (predict: (...args: any[]) => boolean, timeout: number, maxTimeout: number = 0, ...args: any[]): Promise<boolean> {
+	return new Promise<boolean>(resolve => {
+		if (predict(...args))
+			return resolve(true);
+		let count = 0;
+		const timer = setInterval(
+			function () {
+				if (maxTimeout > 0 && ++count * timeout > maxTimeout) {
+					clearInterval(timer);
+					return resolve(false);
+				}
+				else if (predict(...args)) {
+					clearInterval(timer);
+					return resolve(true);
+				}
+			},
+			timeout
+		)
+	});
 }
