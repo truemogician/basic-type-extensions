@@ -7,6 +7,7 @@ declare global {
 		maximum(compareFn?: (a: T, b: T) => number): T;
 		maximum(...keys: ((obj: T) => any)[]): T;
 		keySort(...keys: ((obj: T) => any)[]): T[];
+		shuffle(): T[];
 		intersects(array: Array<T>): boolean;
 		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<void>, thisArg?: any): Promise<void>
 	}
@@ -77,6 +78,17 @@ Array.prototype.keySort = function <T>(this: Array<T>, ...keys: GetKeyFunction<T
 		return 0;
 	}
 	return this.sort(compare);
+}
+Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
+	let temp: T;
+	for (let i = this.length, j; i > 0;) {
+		j = Math.floor(Math.random() * i);
+		--i;
+		temp = this[i];
+		this[i] = this[j];
+		this[j] = temp;
+	}
+	return this;
 }
 Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): boolean {
 	const tmp1 = this.map(x => x).sort((a: T, b: T) => a < b ? -1 : 1);
