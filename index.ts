@@ -1,7 +1,15 @@
 export { }
 declare global {
+	interface ArrayConstructor {
+		intersection<T = any>(array1: T[], array2: T[]): T[];
+		intersection<T = any>(array: T[], ...arrays: T[][]): T[];
+	}
 	interface Array<T> {
 		last(index?: number): T;
+		sum(predicate?: (value: T) => number): number;
+		sumAsync(predicate: (value: T) => Promise<number>): Promise<number>;
+		product(predicate?: (value: T) => number): number;
+		productAsync(predicate: (value: T) => Promise<number>): Promise<number>;
 		minimum(compareFn?: (a: T, b: T) => number): T;
 		minimum(...keys: ((obj: T) => any)[]): T;
 		maximum(compareFn?: (a: T, b: T) => number): T;
@@ -13,7 +21,7 @@ declare global {
 	}
 	interface PromiseConstructor {
 		sleep(milliseconds: number): Promise<void>;
-		wait(predict: (...args: any[]) => boolean, timeout: number, maxTimeout?: number, ...args: any[]): Promise<boolean>;
+		wait(predicate: (...args: any[]) => boolean, timeout: number, maxTimeout?: number, ...args: any[]): Promise<boolean>;
 	}
 	interface StringConstructor {
 		empty: string;
@@ -26,12 +34,95 @@ declare global {
 	interface ObjectConstructor {
 		isEmpty(value: {}): boolean;
 		isNullOrUndefined(value: any): boolean;
+		innerAssign<T>(target: T, source: any): T;
+		innerAssign<T>(target: T, ...sources: any[]): T;
 	}
 }
 type CompareFunction<T> = (a: T, b: T) => number;
 type GetKeyFunction<T> = (obj: T) => any;
+Array.intersection = function <T = any>(...arrays: T[][]): T[] {
+	if (arrays.length == 1)
+		return arrays[0];
+	let tmp1 = new Array<T>();
+	let tmp2 = new Array<T>();
+	let result = new Array<T>();
+	Object.assign(result, arrays[0]).sort((a, b) => a < b ? -1 : 1);
+	for (let k = 1; k < arrays.length; ++k) {
+		tmp1 = result;
+		tmp2 = new Array<T>();
+		Object.assign(tmp2, arrays[k]).sort((a, b) => a < b ? -1 : 1);
+		result = new Array<T>();
+		for (let i = 0, j = 0; i < tmp1.length || j < tmp2.length;) {
+			if (tmp1[i] == tmp2[j]) {
+				result.push(tmp1[i]);
+				++i, ++j;
+			}
+			else if (i < tmp1.length && (j >= tmp2.length || tmp1[i] < tmp2[j]))
+				++i;
+			else
+				++j;
+		}
+		if (!result.length)
+			return result;
+	}
+	return result;
+}
 Array.prototype.last = function <T>(this: Array<T>, index: number = 0): T {
 	return this[this.length - index - 1];
+}
+Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
+	let result = 0;
+	if (!predicate)
+		predicate = value => {
+			switch (typeof value) {
+				case "number": return value
+				case "string": return Number.parseFloat(value)
+				default: throw new Error(typeof value + " cannot be converted to number");
+			}
+		}
+	this.forEach(value => result += predicate!(value));
+	return result;
+}
+Array.prototype.sumAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>): Promise<number> {
+	let result = 0;
+	let count = 0;
+	return new Promise<number>(resolve => {
+		this.forEach(value => {
+			predicate(value).then(res => {
+				result += res;
+				++count;
+				if (count == this.length)
+					resolve(result);
+			});
+		});
+	});
+}
+Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
+	let result = 1;
+	if (!predicate)
+		predicate = value => {
+			switch (typeof value) {
+				case "number": return value
+				case "string": return Number.parseFloat(value)
+				default: throw new Error(typeof value + " cannot be converted to number");
+			}
+		}
+	this.forEach(value => result *= predicate!(value));
+	return result;
+}
+Array.prototype.productAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>): Promise<number> {
+	let result = 1;
+	let count = 0;
+	return new Promise<number>(resolve => {
+		this.forEach(value => {
+			predicate(value).then(res => {
+				result *= res;
+				++count;
+				if (count == this.length)
+					resolve(result);
+			});
+		});
+	});
 }
 Array.prototype.minimum = function <T>(this: Array<T>, func?: CompareFunction<T> | GetKeyFunction<T>, ...keys: GetKeyFunction<T>[]) {
 	if (!this?.length)
@@ -103,14 +194,15 @@ Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
 	return this;
 }
 Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): boolean {
-	const tmp1 = this.map(x => x).sort((a: T, b: T) => a < b ? -1 : 1);
-	const tmp2 = array.map(x => x).sort((a: T, b: T) => a < b ? -1 : 1);
+	let tmp1 = new Array<T>(), tmp2 = new Array<T>();
+	Object.assign(tmp1, this).sort((a, b) => a < b ? -1 : 1);
+	Object.assign(tmp2, array).sort((a, b) => a < b ? -1 : 1);
 	for (let i = 0, j = 0; i < tmp1.length && j < tmp2.length;) {
 		if (tmp1[i] == tmp2[j])
 			return true;
 		if (i < tmp1.length && (j >= tmp2.length || tmp1[i] < tmp2[j]))
 			++i;
-		else if (j < tmp2.length && (i >= tmp1.length || tmp2[j] < tmp1[i]))
+		else
 			++j;
 	}
 	return false;
@@ -126,12 +218,13 @@ Array.prototype.forEachAsync = async function <T>(this: Array<T>, callbackfn: (v
 		}, thisArg)
 	})
 }
+
 Promise.sleep = async function (milliseconds: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
-Promise.wait = async function (predict: (...args: any[]) => boolean, timeout: number, maxTimeout: number = 0, ...args: any[]): Promise<boolean> {
+Promise.wait = async function (predicate: (...args: any[]) => boolean, timeout: number, maxTimeout: number = 0, ...args: any[]): Promise<boolean> {
 	return new Promise<boolean>(resolve => {
-		if (predict(...args))
+		if (predicate(...args))
 			return resolve(true);
 		let count = 0;
 		const timer = setInterval(
@@ -140,7 +233,7 @@ Promise.wait = async function (predict: (...args: any[]) => boolean, timeout: nu
 					clearInterval(timer);
 					return resolve(false);
 				}
-				else if (predict(...args)) {
+				else if (predicate(...args)) {
 					clearInterval(timer);
 					return resolve(true);
 				}
@@ -149,6 +242,7 @@ Promise.wait = async function (predict: (...args: any[]) => boolean, timeout: nu
 		)
 	});
 }
+
 String.empty = "";
 String.isNullOrEmpty = function (value: string): boolean {
 	return value == null || value == "";
@@ -162,9 +256,19 @@ String.prototype.remove = function (this: string, from: number, length?: number)
 	else
 		return this.substr(0, from);
 }
+
 Object.isEmpty = function (value: {}): boolean {
 	return Object.keys(value).length == 0;
 }
 Object.isNullOrUndefined = function (value: any): boolean {
 	return value == null || value == undefined;
+}
+Object.innerAssign = function <T>(target: T, source: any, ...sources: any[]): T {
+	const keys = Object.keys(target);
+	for (const src of [source, ...sources]) {
+		const srcKeys = Object.keys(src);
+		const inter = Array.intersection(keys, srcKeys);
+		inter.forEach(key => (target as any)[key] = src[key]);
+	}
+	return target;
 }
