@@ -15,6 +15,14 @@ declare global {
 		sleep(milliseconds: number): Promise<void>;
 		wait(predict: (...args: any[]) => boolean, timeout: number, maxTimeout?: number, ...args: any[]): Promise<boolean>;
 	}
+	interface StringConstructor {
+		empty: string;
+		isNullOrEmpty(value: string): boolean;
+		isNullOrWhiteSpace(value: string): boolean;
+	}
+	interface String {
+		remove(from: number, length?: number): string;
+	}
 }
 type CompareFunction<T> = (a: T, b: T) => number;
 type GetKeyFunction<T> = (obj: T) => any;
@@ -136,4 +144,17 @@ Promise.wait = async function (predict: (...args: any[]) => boolean, timeout: nu
 			timeout
 		)
 	});
+}
+String.empty = "";
+String.isNullOrEmpty = function (value: string): boolean {
+	return value == null || value == "";
+}
+String.isNullOrWhiteSpace = function (value: string): boolean {
+	return value == null || /^\s*$/.test(value);
+}
+String.prototype.remove = function (this: string, from: number, length?: number): string {
+	if (length && from + length < this.length)
+		return this.substr(0, from) + this.substr(from + length)
+	else
+		return this.substr(0, from);
 }
