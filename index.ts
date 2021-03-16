@@ -23,6 +23,10 @@ declare global {
 	interface String {
 		remove(from: number, length?: number): string;
 	}
+	interface ObjectConstructor {
+		isEmpty(value: {}): boolean;
+		isNullOrUndefined(value: any): boolean;
+	}
 }
 type CompareFunction<T> = (a: T, b: T) => number;
 type GetKeyFunction<T> = (obj: T) => any;
@@ -157,4 +161,10 @@ String.prototype.remove = function (this: string, from: number, length?: number)
 		return this.substr(0, from) + this.substr(from + length)
 	else
 		return this.substr(0, from);
+}
+Object.isEmpty = function (value: {}): boolean {
+	return Object.keys(value).length == 0;
+}
+Object.isNullOrUndefined = function (value: any): boolean {
+	return value == null || value == undefined;
 }
