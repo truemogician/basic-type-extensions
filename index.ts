@@ -3,6 +3,8 @@ declare global {
 	interface ArrayConstructor {
 		intersection<T = any>(array1: T[], array2: T[]): T[];
 		intersection<T = any>(array: T[], ...arrays: T[][]): T[];
+		union<T = any>(array1: T[], array2: T[]): T[];
+		union<T = any>(array: T[], ...arrays: T[][]): T[];
 	}
 	interface Array<T> {
 		last(index?: number): T;
@@ -64,6 +66,31 @@ Array.intersection = function <T = any>(...arrays: T[][]): T[] {
 		}
 		if (!result.length)
 			return result;
+	}
+	return result;
+}
+Array.union = function <T = any>(...arrays: T[][]): T[] {
+	if (arrays.length == 1)
+		return arrays[0];
+	let tmp1 = new Array<T>();
+	let tmp2 = new Array<T>();
+	let result = new Array<T>();
+	Object.assign(result, arrays[0]).sort((a, b) => a < b ? -1 : 1);
+	for (let k = 1; k < arrays.length; ++k) {
+		tmp1 = result;
+		tmp2 = new Array<T>();
+		Object.assign(tmp2, arrays[k]).sort((a, b) => a < b ? -1 : 1);
+		result = new Array<T>();
+		for (let i = 0, j = 0; i < tmp1.length || j < tmp2.length;) {
+			if (tmp1[i] == tmp2[j]) {
+				result.push(tmp1[i]);
+				++i, ++j;
+			}
+			else if (i < tmp1.length && (j >= tmp2.length || tmp1[i] < tmp2[j]))
+				result.push(tmp1[i++]);
+			else
+				result.push(tmp2[j++]);
+		}
 	}
 	return result;
 }
