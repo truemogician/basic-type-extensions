@@ -1,5 +1,4 @@
-.vscode
-.gitignore
-index.ts
-test.ts
-tsconfig.json
+/*
+!index.d.ts
+!index.js
+!package.json

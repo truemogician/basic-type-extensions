@@ -4,9 +4,15 @@
 	"description": "Some useful extensions for Javascript/Typescript basic types",
 	"main": "index.js",
 	"scripts": {
-		"test": "ts-node test.ts",
+		"test": "jest",
 		"build": "tsc -p tsconfig.json"
 	},
 	"author": "true_mogician",
-	"license": "MIT"
+	"license": "MIT",
+	"devDependencies": {
+		"@types/jest": "^26.0.22",
+		"jest": "^26.6.3",
+		"ts-jest": "^26.5.4",
+		"typescript": "^4.2.3"
+	}
 }
