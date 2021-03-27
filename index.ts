@@ -2,9 +2,9 @@ export { }
 declare global {
 	interface ArrayConstructor {
 		intersection<T = any>(array1: T[], array2: T[]): T[];
-		intersection<T = any>(array: T[], ...arrays: T[][]): T[];
+		intersection<T = any>(...arrays: T[][]): T[];
 		union<T = any>(array1: T[], array2: T[]): T[];
-		union<T = any>(array: T[], ...arrays: T[][]): T[];
+		union<T = any>(...arrays: T[][]): T[];
 	}
 	interface Array<T> {
 		last(index?: number): T;
@@ -18,7 +18,12 @@ declare global {
 		maximum(...keys: ((obj: T) => any)[]): T;
 		keySort(...keys: ((obj: T) => any)[]): T[];
 		shuffle(): T[];
+		repeat(count?: number): T[];
 		intersects(array: Array<T>): boolean;
+		isAscending(predicate?: (a: T, b: T) => number): boolean;
+		isAscending(...keys: ((obj: T) => any)[]): boolean;
+		isDescending(predicate?: (a: T, b: T) => number): boolean;
+		isDescending(...keys: ((obj: T) => any)[]): boolean;
 		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<void>, thisArg?: any): Promise<void>
 	}
 	interface PromiseConstructor {
@@ -27,8 +32,8 @@ declare global {
 	}
 	interface StringConstructor {
 		empty: string;
-		isNullOrEmpty(value: string): boolean;
-		isNullOrWhiteSpace(value: string): boolean;
+		isNullOrEmpty(value: string | null): boolean;
+		isNullOrWhiteSpace(value: string | null): boolean;
 	}
 	interface String {
 		remove(from: number, length?: number): string;
@@ -40,21 +45,43 @@ declare global {
 		isNullOrUndefined(value: any): boolean;
 		innerAssign<T>(target: T, source: any): T;
 		innerAssign<T>(target: T, ...sources: any[]): T;
+		clone<T>(src: T): T;
 	}
 }
-type CompareFunction<T> = (a: T, b: T) => number;
-type GetKeyFunction<T> = (obj: T) => any;
+type Comparer<T> = (a: T, b: T) => number;
+type Mapper<T, R = any> = (obj: T) => R;
+const defaultComparer = function <T>(a: T, b: T): number {
+	return a < b ? -1 : a > b ? 1 : 0;
+}
+const keyOrderComparer = function <T>(...keys: Mapper<T>[]): Comparer<T> {
+	return (a, b) => {
+		for (const key of keys) {
+			if (key(a) < key(b))
+				return -1;
+			else if (key(a) > key(b))
+				return 1;
+		}
+		return 0;
+	}
+}
+//#region ArrayConstructor
 Array.intersection = function <T = any>(...arrays: T[][]): T[] {
-	if (arrays.length == 1)
+	if (arrays.length == 0)
+		return null;
+	else if (arrays.length == 1)
 		return arrays[0];
 	let tmp1 = new Array<T>();
 	let tmp2 = new Array<T>();
 	let result = new Array<T>();
-	Object.assign(result, arrays[0]).sort((a, b) => a < b ? -1 : 1);
+	Object.assign(result, arrays[0]);
+	if (!result.isAscending())
+		result.keySort();
 	for (let k = 1; k < arrays.length; ++k) {
 		tmp1 = result;
 		tmp2 = new Array<T>();
-		Object.assign(tmp2, arrays[k]).sort((a, b) => a < b ? -1 : 1);
+		Object.assign(tmp2, arrays[k]);
+		if (!tmp2.isAscending())
+			tmp2.keySort();
 		result = new Array<T>();
 		for (let i = 0, j = 0; i < tmp1.length || j < tmp2.length;) {
 			if (tmp1[i] == tmp2[j]) {
@@ -72,16 +99,22 @@ Array.intersection = function <T = any>(...arrays: T[][]): T[] {
 	return result;
 }
 Array.union = function <T = any>(...arrays: T[][]): T[] {
-	if (arrays.length == 1)
+	if (arrays.length == 0)
+		return null;
+	else if (arrays.length == 1)
 		return arrays[0];
 	let tmp1 = new Array<T>();
 	let tmp2 = new Array<T>();
 	let result = new Array<T>();
-	Object.assign(result, arrays[0]).sort((a, b) => a < b ? -1 : 1);
+	Object.assign(result, arrays[0]);
+	if (!result.isAscending())
+		result.keySort();
 	for (let k = 1; k < arrays.length; ++k) {
 		tmp1 = result;
 		tmp2 = new Array<T>();
-		Object.assign(tmp2, arrays[k]).sort((a, b) => a < b ? -1 : 1);
+		Object.assign(tmp2, arrays[k]);
+		if (!tmp2.isAscending())
+			tmp2.keySort();
 		result = new Array<T>();
 		for (let i = 0, j = 0; i < tmp1.length || j < tmp2.length;) {
 			if (tmp1[i] == tmp2[j]) {
@@ -96,6 +129,8 @@ Array.union = function <T = any>(...arrays: T[][]): T[] {
 	}
 	return result;
 }
+//#endregion
+//#region Array
 Array.prototype.last = function <T>(this: Array<T>, index: number = 0): T {
 	return this[this.length - index - 1];
 }
@@ -105,6 +140,7 @@ Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => num
 		predicate = value => {
 			switch (typeof value) {
 				case "number": return value
+				case "boolean": return Number(value)
 				case "string": return Number.parseFloat(value)
 				default: throw new Error(typeof value + " cannot be converted to number");
 			}
@@ -132,6 +168,7 @@ Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) =>
 		predicate = value => {
 			switch (typeof value) {
 				case "number": return value
+				case "boolean": return Number(value)
 				case "string": return Number.parseFloat(value)
 				default: throw new Error(typeof value + " cannot be converted to number");
 			}
@@ -153,21 +190,12 @@ Array.prototype.productAsync = async function <T>(this: Array<T>, predicate: (va
 		});
 	});
 }
-Array.prototype.minimum = function <T>(this: Array<T>, func?: CompareFunction<T> | GetKeyFunction<T>, ...keys: GetKeyFunction<T>[]) {
+Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]) {
 	if (!this?.length)
 		return undefined;
-	let compare: CompareFunction<T> =
-		(!func || func.length == 2) ?
-			func as CompareFunction<T> :
-			(a, b) => {
-				for (const key of [func as GetKeyFunction<T>, ...keys]) {
-					if (key(a) < key(b))
-						return -1;
-					else if (key(a) > key(b))
-						return 1;
-				}
-				return 0;
-			}
+	let compare: Comparer<T> = !func
+		? defaultComparer
+		: func.length == 2 ? func : keyOrderComparer(func as Mapper<T>, ...keys);
 	let result = this[0];
 	for (let i = 1; i < this.length; ++i) {
 		if (compare(this[i], result) < 0)
@@ -175,21 +203,12 @@ Array.prototype.minimum = function <T>(this: Array<T>, func?: CompareFunction<T>
 	}
 	return result;
 }
-Array.prototype.maximum = function <T>(this: Array<T>, func?: CompareFunction<T> | GetKeyFunction<T>, ...keys: GetKeyFunction<T>[]) {
+Array.prototype.maximum = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]) {
 	if (!this?.length)
 		return undefined;
-	let compare: CompareFunction<T> =
-		(!func || func.length == 2) ?
-			func as CompareFunction<T> :
-			(a, b) => {
-				for (const key of [func as GetKeyFunction<T>, ...keys]) {
-					if (key(a) < key(b))
-						return -1;
-					else if (key(a) > key(b))
-						return 1;
-				}
-				return 0;
-			}
+	let compare: Comparer<T> = !func
+		? defaultComparer
+		: func.length == 2 ? func : keyOrderComparer(func as Mapper<T>, ...keys);
 	let result = this[0];
 	for (let i = 1; i < this.length; ++i) {
 		if (compare(this[i], result) > 0)
@@ -197,18 +216,10 @@ Array.prototype.maximum = function <T>(this: Array<T>, func?: CompareFunction<T>
 	}
 	return result;
 }
-Array.prototype.keySort = function <T>(this: Array<T>, ...keys: GetKeyFunction<T>[]): T[] {
+Array.prototype.keySort = function <T>(this: Array<T>, ...keys: Mapper<T>[]): T[] {
 	if (!this || this.length < 2)
 		return this;
-	let compare: CompareFunction<T> = (a, b) => {
-		for (const key of keys) {
-			if (key(a) < key(b))
-				return -1;
-			else if (key(a) > key(b))
-				return 1;
-		}
-		return 0;
-	}
+	const compare = keys?.length ? keyOrderComparer(...keys) : defaultComparer;
 	return this.sort(compare);
 }
 Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
@@ -222,10 +233,25 @@ Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
 	}
 	return this;
 }
+Array.prototype.repeat = function <T>(this: Array<T>, count: number = 1): T[] {
+	if (count < 0)
+		return null;
+	const result = new Array<T>(this.length * count);
+	for (let i = 0, j = 0; i < result.length; ++i, ++j) {
+		if (j == this.length)
+			j = 0;
+		result[i] = this[j];
+	}
+	return result;
+}
 Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): boolean {
 	let tmp1 = new Array<T>(), tmp2 = new Array<T>();
-	Object.assign(tmp1, this).sort((a, b) => a < b ? -1 : 1);
-	Object.assign(tmp2, array).sort((a, b) => a < b ? -1 : 1);
+	Object.assign(tmp1, this);
+	if (!tmp1.isAscending())
+		tmp1.keySort();
+	Object.assign(tmp2, array);
+	if (!tmp2.isAscending())
+		tmp2.keySort();
 	for (let i = 0, j = 0; i < tmp1.length && j < tmp2.length;) {
 		if (tmp1[i] == tmp2[j])
 			return true;
@@ -235,6 +261,24 @@ Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): bool
 			++j;
 	}
 	return false;
+}
+Array.prototype.isAscending = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]): boolean {
+	let compare: Comparer<T> = !func
+		? defaultComparer
+		: func.length == 2 ? func : keyOrderComparer(func as Mapper<T>, ...keys);
+	for (let i = 1; i < this.length; ++i)
+		if (compare(this[i - 1], this[i]) > 0)
+			return false;
+	return true;
+}
+Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]): boolean {
+	let compare: Comparer<T> = !func
+		? defaultComparer
+		: func.length == 2 ? func : keyOrderComparer(func as Mapper<T>, ...keys);
+	for (let i = 1; i < this.length; ++i)
+		if (compare(this[i - 1], this[i]) < 0)
+			return false;
+	return true;
 }
 Array.prototype.forEachAsync = async function <T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<void>, thisArg?: any): Promise<void> {
 	let finishedCount = 0;
@@ -247,7 +291,9 @@ Array.prototype.forEachAsync = async function <T>(this: Array<T>, callbackfn: (v
 		}, thisArg)
 	})
 }
+//#endregion
 
+//#region PromiseConstructor
 Promise.sleep = async function (milliseconds: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
@@ -267,20 +313,27 @@ Promise.wait = async function (predicate: (...args: any[]) => boolean, timeout: 
 					return resolve(true);
 				}
 			},
-			timeout
+			timeout,
+			...args
 		)
 	});
 }
+//#endregion
 
+//#region StringConstructor
 String.empty = "";
-String.isNullOrEmpty = function (value: string): boolean {
+String.isNullOrEmpty = function (value: string | null): boolean {
 	return value == null || value == "";
 }
-String.isNullOrWhiteSpace = function (value: string): boolean {
+String.isNullOrWhiteSpace = function (value: string | null): boolean {
 	return value == null || /^\s*$/.test(value);
 }
+//#endregion
+//#region String
 String.prototype.remove = function (this: string, from: number, length?: number): string {
-	if (length && from + length < this.length)
+	if (length && length <= 0)
+		return this;
+	else if (length && from + length < this.length)
 		return this.substr(0, from) + this.substr(from + length)
 	else
 		return this.substr(0, from);
@@ -288,7 +341,8 @@ String.prototype.remove = function (this: string, from: number, length?: number)
 String.prototype.splitAt = function (this: string, indices: number | number[], charAtIndex: "pred" | "succ" | "both" | "none" = "succ"): string[] {
 	if (typeof indices == "number")
 		indices = [indices];
-	indices.sort((a, b) => a - b);
+	if (!indices.isAscending())
+		indices.keySort();
 	let start = 0, end = 1;
 	for (let negative = indices[0] < 0; end < indices.length; negative = indices[end++] < 0) {
 		if (negative)
@@ -317,7 +371,9 @@ String.prototype.splitAt = function (this: string, indices: number | number[], c
 		result.push(sub);
 	return result;
 }
+//#endregion
 
+//#region ObjectConstructor
 Object.isEmpty = function (value: {}): boolean {
 	return Object.keys(value).length == 0;
 }
@@ -333,3 +389,5 @@ Object.innerAssign = function <T>(target: T, source: any, ...sources: any[]): T 
 	}
 	return target;
 }
+Object.clone = require("lodash.clonedeep")
+//#endregion
