@@ -33,6 +33,61 @@ describe("Array<T>", () => {
 		test("negative", () => expect(arrays[0].last(-1)).toBeUndefined());
 		test("overflow", () => expect(arrays[0].last(100)).toBeUndefined());
 	});
+	describe("insert", () => {
+		test("normal", () => {
+			const arr = Object.clone(arrays[0]);
+			expect(arr.insert(3)).toBe(3);
+			expect(arr).toStrictEqual([0, 1, 2, 3, 3, 4]);
+		});
+		test("border", () => {
+			const arr = Object.clone(arrays[0]);
+			expect(arr.insert(10)).toBe(5);
+			expect(arr).toStrictEqual([0, 1, 2, 3, 4, 10]);
+			expect(arr.insert(-1)).toBe(0);
+			expect(arr).toStrictEqual([-1, 0, 1, 2, 3, 4, 10]);
+		});
+		test("empty array", () => {
+			const arr = [];
+			expect(arr.insert(10)).toBe(0);
+			expect(arr).toStrictEqual([10]);
+		});
+	});
+	describe("insertAt", () => {
+		test("normal", () => {
+			const arr = Object.clone(arrays[0]);
+			expect(arr.insertAt(-1, 3)).toBe(true);
+			expect(arr).toStrictEqual([0, 1, 2, -1, 3, 4]);
+		});
+		test("out of range", () => {
+			const arr = Object.clone(arrays[0]);
+			expect(arr.insertAt(-1, 10)).toBe(false);
+			expect(arr).toStrictEqual(arrays[0]);
+		});
+	});
+	describe("remove", () => {
+		test("normal", () => {
+			const arr = Object.clone(arrays[2]);
+			expect(arr.remove(1)).toBe(3);
+			expect(arr).toStrictEqual([0, 0, 3, 9]);
+		});
+		test("none", () => {
+			const arr = Object.clone(arrays[2]);
+			expect(arr.remove(10)).toBe(0);
+			expect(arr).toStrictEqual(arrays[2]);
+		});
+	});
+	describe("removeAt", () => {
+		test("normal", () => {
+			const arr = Object.clone(arrays[0]);
+			expect(arr.removeAt(2)).toBe(true);
+			expect(arr).toStrictEqual([0, 1, 3, 4]);
+		});
+		test("out of range", () => {
+			const arr = Object.clone(arrays[0]);
+			expect(arr.removeAt(10)).toBe(false);
+			expect(arr).toStrictEqual(arrays[0]);
+		});
+	});
 	describe("sum & sumAsync", () => {
 		test("default", () => expect([true, 2, "3"].sum()).toBe(6));
 		test("other", () => expect(() => { [[0], { key: "value" }].sum() }).toThrow());
@@ -44,7 +99,7 @@ describe("Array<T>", () => {
 				setTimeout(() => resolve(num), duration)
 			)).then(result => {
 				expect(result).toBe(10);
-				expect(Math.abs(Date.now() - start - duration)).toBeLessThan(10);
+				expect(Math.abs(Date.now() - start - duration)).toBeLessThan(25);
 			})
 		});
 	});
@@ -59,7 +114,7 @@ describe("Array<T>", () => {
 				setTimeout(() => resolve(num), duration)
 			)).then(result => {
 				expect(result).toBe(24);
-				expect(Math.abs(Date.now() - start - duration)).toBeLessThan(10);
+				expect(Math.abs(Date.now() - start - duration)).toBeLessThan(25);
 			})
 		});
 	});

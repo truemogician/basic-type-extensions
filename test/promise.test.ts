@@ -4,7 +4,7 @@ test("sleep", async () => {
 	const start = Date.now();
 	const duration = 1000;
 	await Promise.sleep(duration);
-	expect(Math.abs(Date.now() - start - duration)).toBeLessThan(5);
+	expect(Math.abs(Date.now() - start - duration)).toBeLessThan(50);
 });
 describe("wait", () => {
 	const duration = 500;
