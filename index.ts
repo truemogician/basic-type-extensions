@@ -8,6 +8,10 @@ declare global {
 	}
 	interface Array<T> {
 		last(index?: number): T;
+		insert(value: T): number;
+		insertAt(value: T, index: number): boolean;
+		remove(value: T): number;
+		removeAt(index: number): boolean;
 		sum(predicate?: (value: T) => number): number;
 		sumAsync(predicate: (value: T) => Promise<number>): Promise<number>;
 		product(predicate?: (value: T) => number): number;
@@ -133,6 +137,39 @@ Array.union = function <T = any>(...arrays: T[][]): T[] {
 //#region Array
 Array.prototype.last = function <T>(this: Array<T>, index: number = 0): T {
 	return this[this.length - index - 1];
+}
+Array.prototype.insert = function <T>(this: Array<T>, value: T): number {
+	let l = 0, r = this.length - 1, m;
+	while (l <= r) {
+		m = l + (r - l >> 1);
+		if (value <= this[m])
+			r = m - 1;
+		else
+			l = m + 1;
+	}
+	this.splice(l, 0, value);
+	return l;
+}
+Array.prototype.insertAt = function <T>(this: Array<T>, value: T, index: number): boolean {
+	if (index < 0 || index >= this.length || !Number.isSafeInteger(index))
+		return false;
+	this.splice(index, 0, value);
+	return true;
+}
+Array.prototype.remove = function <T>(this: Array<T>, value: T): number {
+	let count = 0;
+	for (let i = this.length - 1; i >= 0; --i)
+		if (this[i] === value) {
+			this.splice(i, 1);
+			++count;
+		}
+	return count;
+}
+Array.prototype.removeAt = function <T>(this: Array<T>, index: number): boolean {
+	if (index < 0 || index >= this.length || !Number.isSafeInteger(index))
+		return false;
+	this.splice(index, 1);
+	return true;
 }
 Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
 	let result = 0;
