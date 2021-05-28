@@ -1,54 +1,231 @@
 export { }
 declare global {
 	interface ArrayConstructor {
+		/**
+		 * Calculate the intersection of two arrays
+		 * @param array1 The first array
+		 * @param array2 The second array
+		 * @returns Intersection result. For duplicate values, the minor amount of which will be kept
+		 */
 		intersection<T = any>(array1: T[], array2: T[]): T[];
+		/**
+		 * Calculate the intersection of multiple arrays
+		 * @param arrays Arrays
+		 * @returns Intersection result. For duplicate values, the minimum amount of which will be kept
+		 */
 		intersection<T = any>(...arrays: T[][]): T[];
+		/**
+		 * Calculate the union of two arrays
+		 * @param array1 The first array
+		 * @param array2 The second array
+		 * @returns Union result. For duplicate values, the major amount of which will be kept
+		 */
 		union<T = any>(array1: T[], array2: T[]): T[];
+		/**
+		 * Calculate the union of multiple arrays
+		 * @param arrays Arrays
+		 * @returns Union result. For duplicate values, the maximum amount of which will be kept
+		 */
 		union<T = any>(...arrays: T[][]): T[];
 	}
 	interface Array<T> {
+		/**
+		 * Index the array backward
+		 * @param index Backward index. Default is 0
+		 */
 		last(index?: number): T;
+		/**
+		 * Insert a value into an ascending array using binary search
+		 * @param value Value to be inserted
+		 * @returns The index where `value` is inserted
+		 */
 		insert(value: T): number;
+		/**
+		 * Insert a value into specific position
+		 * @param value Value to be inserted
+		 * @param index Index where `value` will be inserted
+		 * @returns True if `value` is successfully inserted
+		 */
 		insertAt(value: T, index: number): boolean;
+		/**
+		 * Remove all items that equals to `value` from array
+		 * @param value Value to be remoevd
+		 * @returns The number of items removed
+		 */
 		remove(value: T): number;
+		/**
+		 * Remove the item at `index` from array
+		 * @param index Index of item to be removed
+		 * @returns True if item is successfully removed
+		 */
 		removeAt(index: number): boolean;
+		/**
+		 * Calculate the summary of the array
+		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
+		 */
 		sum(predicate?: (value: T) => number): number;
+		/**
+		 * Calculate the summary of the array
+		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited
+		 */
 		sumAsync(predicate: (value: T) => Promise<number>): Promise<number>;
+		/**
+		 * Calculate the product of the array
+		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
+		 */
 		product(predicate?: (value: T) => number): number;
+		/**
+		 * Calculate the product of the array
+		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited
+		 */
 		productAsync(predicate: (value: T) => Promise<number>): Promise<number>;
+		/**
+		 * Get the minimum item in array
+		 * @param compareFn Compare function
+		 */
 		minimum(compareFn?: (a: T, b: T) => number): T;
+		/**
+		 * Get the minimum item in array using key comparison
+		 * @param keys Array of key-generation functions
+		 */
 		minimum(...keys: ((obj: T) => any)[]): T;
+		/**
+		 * Get the maximum item in array
+		 * @param compareFn Compare function
+		 */
 		maximum(compareFn?: (a: T, b: T) => number): T;
+		/**
+		 * Get the maximum item in array using key comparison
+		 * @param keys Array of key-generation functions
+		 */
 		maximum(...keys: ((obj: T) => any)[]): T;
+		/**
+		 * Sort the array using key sort
+		 * @param keys Array of key-generation functions
+		 */
 		keySort(...keys: ((obj: T) => any)[]): T[];
+		/**
+		 * Shuffle the array randomly
+		 */
 		shuffle(): T[];
+		/**
+		 * Repeat the array `count` times
+		 * @param count Default is 1, which means no repeat
+		 */
 		repeat(count?: number): T[];
+		/**
+		 * Check whether the array has common elements with another array
+		 * @param array Another array
+		 */
 		intersects(array: Array<T>): boolean;
+		/**
+		 * Check whether the array is ascending
+		 * @param predicate Compare function
+		 */
 		isAscending(predicate?: (a: T, b: T) => number): boolean;
+		/**
+		 * Check whether the array is ascending using key comparison
+		 * @param keys Array of key-generation functions
+		 */
 		isAscending(...keys: ((obj: T) => any)[]): boolean;
+		/**
+		 * Check whether the array is descending
+		 * @param predicate Compare function
+		 */
 		isDescending(predicate?: (a: T, b: T) => number): boolean;
+		/**
+		 * Check whether the array is descending using key comparison
+		 * @param keys Array of key-generation functions
+		 */
 		isDescending(...keys: ((obj: T) => any)[]): boolean;
+		/**
+		 * Performs the specified asynchronous action for each element in an array
+		 * @param callbackfn  An asynchronous function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array
+		 * @param thisArg  An object to which the this keyword can refer in the callbackfn function. If `thisArg` is omitted, undefined is used as the this value
+		 */
 		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<void>, thisArg?: any): Promise<void>
 	}
 	interface PromiseConstructor {
+		/**
+		 * Sleep for a period of time
+		 * @param milliseconds Number of milliseconds to sleep
+		 */
 		sleep(milliseconds: number): Promise<void>;
-		wait(predicate: (...args: any[]) => boolean, timeout: number, maxTimeout?: number, ...args: any[]): Promise<boolean>;
+		/**
+		 * Wait until `predicate` returns true or `timeout` limit is exceeded
+		 * @param interval Checking interval, unit: ms
+		 * @param timeout Max waiting time, unit: ms
+		 * @param args Arguments to be passed to `predicate`
+		 */
+		wait(predicate: (...args: any[]) => boolean, interval: number, timeout?: number, ...args: any[]): Promise<boolean>;
 	}
 	interface StringConstructor {
+		/**
+		 * An empty string
+		 */
 		empty: string;
+		/**
+		 * Check whether `value` is null or empty string
+		 */
 		isNullOrEmpty(value: string | null): boolean;
+		/**
+		 * Check whether `value` is null or contains whitespace only
+		 */
 		isNullOrWhiteSpace(value: string | null): boolean;
 	}
 	interface String {
+		/**
+		 * Remove `length` characters from string starting at `from`
+		 * @param from Start index
+		 * @param length Number of characters to remove
+		 */
 		remove(from: number, length?: number): string;
+		/**
+		 * Split the string into two substrings
+		 * @param index Where the string will be splited at
+		 * @param charAtIndex Determines how the character at `index` will be handled. Default is `"succ"`
+		 * `"pre"`: Place in the preceding substring  
+		 * `"succ"`: Place in the succeeding substring  
+		 * `"both"`: Place in both substrings  
+		 * `"none"`: Ignore the character
+		 */
 		splitAt(index: number, charAtIndex?: "pred" | "succ" | "both" | "none"): string[];
+		/**
+		 * Split the string into multiple substrings
+		 * @param indices Array of indices indicating where the string will be splited at
+		 * @param charAtIndex Determines how the character at `index` will be handled. Default is `"succ"`   
+		 * `"pre"`: Place in the preceding substring  
+		 * `"succ"`: Place in the succeeding substring  
+		 * `"both"`: Place in both substrings  
+		 * `"none"`: Ignore the character
+		 */
 		splitAt(indices: number[], charAtIndex?: "pred" | "succ" | "both" | "none"): string[]
 	}
 	interface ObjectConstructor {
+		/**
+		 * Check whether `value` has no keys
+		 */
 		isEmpty(value: {}): boolean;
+		/**
+		 * Check whether `value` is null or undefined
+		 */
 		isNullOrUndefined(value: any): boolean;
+		/**
+		 * Assign values of the common keys of `target` and `source` from `source` to `target`
+		 * @param target Target object
+		 * @param source Source object
+		 */
 		innerAssign<T>(target: T, source: any): T;
+		/**
+		 * Assign values of the common keys of `target` and `sources` from `sources` to `target`
+		 * @param target Target object
+		 * @param sources Array of source objects
+		 */
 		innerAssign<T>(target: T, ...sources: any[]): T;
+		/**
+		 * Deep clone an instance
+		 * @param src Source instance
+		 */
 		clone<T>(src: T): T;
 	}
 }
