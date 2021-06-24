@@ -158,6 +158,13 @@ declare global {
 		 * @param args Arguments to be passed to `predicate`
 		 */
 		wait(predicate: (...args: any[]) => boolean, interval: number, timeout?: number, ...args: any[]): Promise<boolean>;
+		/**
+		 * Wait until `predicate` returns true or `timeout` limit is exceeded
+		 * @param interval Checking interval, unit: ms
+		 * @param timeout Max waiting time, unit: ms
+		 * @param args Arguments to be passed to `predicate`
+		 */
+		wait(predicate: (...args: any[]) => Promise<boolean>, interval: number, timeout?: number, ...args: any[]): Promise<boolean>;
 	}
 	interface StringConstructor {
 		/**
@@ -227,6 +234,30 @@ declare global {
 		 * @param src Source instance
 		 */
 		clone<T>(src: T): T;
+	}
+	interface Math {
+		/**
+		 * Returns a random integer between `min` and `max`
+		 * @param min Lower bound
+		 * @param max Upper bound (not reachable)
+		 */
+		randomInteger(min: number, max: number): number;
+		/**
+		 * Returns a random integer between 0 and `max`
+		 * @param max Upper bound (not reachable)
+		 */
+		randomInteger(max: number): number;
+		/**
+		 * Returns a random float number between `min` and `max`
+		 * @param min Lower bound
+		 * @param max Upper bound
+		 */
+		randomFloat(min: number, max: number): number;
+		/**
+		 * Returns a random float number between 0 and `max`
+		 * @param max Upper bound
+		 */
+		randomFloat(max: number): number;
 	}
 }
 type Comparer<T> = (a: T, b: T) => number;
@@ -511,25 +542,57 @@ Array.prototype.forEachAsync = async function <T>(this: Array<T>, callbackfn: (v
 Promise.sleep = async function (milliseconds: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
-Promise.wait = async function (predicate: (...args: any[]) => boolean, timeout: number, maxTimeout: number = 0, ...args: any[]): Promise<boolean> {
-	return new Promise<boolean>(resolve => {
-		if (predicate(...args))
+Promise.wait = async function (predicate: (...args: any[]) => boolean | Promise<boolean>, interval: number, timeout: number = 0, ...args: any[]): Promise<boolean> {
+	return new Promise<boolean>(async resolve => {
+		let result = predicate(...args);
+		if (typeof result == "boolean" && result)
 			return resolve(true);
+		if (typeof result != "boolean") {
+			if (timeout == 0 && await result)
+				return resolve(true);
+			else if (timeout > 0) {
+				const res = await Promise.race([result, Promise.sleep(timeout)]);
+				if (typeof res != "boolean")
+					return resolve(false);
+				else if (res === true)
+					return resolve(true);
+			}
+		}
 		let count = 0;
+		let lastFinished = true;
 		const timer = setInterval(
-			function () {
-				if (maxTimeout > 0 && ++count * timeout > maxTimeout) {
+			async function () {
+				++count;
+				if (timeout > 0 && count * interval > timeout) {
 					clearInterval(timer);
 					return resolve(false);
 				}
-				else if (predicate(...args)) {
-					clearInterval(timer);
-					return resolve(true);
+				else if (lastFinished) {
+					result = predicate(...args);
+					if (typeof result == "boolean" && result) {
+						clearInterval(timer);
+						return resolve(true);
+					}
+					if (typeof result != "boolean") {
+						lastFinished = false;
+						if (timeout == 0 && await result) {
+							clearInterval(timer);
+							return resolve(true);
+						}
+						else if (timeout > 0) {
+							const res = await Promise.race([result, Promise.sleep(timeout - count * interval)]);
+							if (typeof res != "boolean" || res === true) {
+								clearInterval(timer);
+								return resolve(res === true);
+							}
+						}
+						lastFinished = true;
+					}
 				}
 			},
-			timeout,
+			interval,
 			...args
-		)
+		);
 	});
 }
 //#endregion
@@ -604,4 +667,17 @@ Object.innerAssign = function <T>(target: T, source: any, ...sources: any[]): T 
 	return target;
 }
 Object.clone = require("lodash.clonedeep")
+//#endregion
+
+//#region Math
+Math.randomInteger = function (param1: number, param2?: number): number {
+	const min = Math.ceil(param2 === undefined ? 0 : param1);
+	const max = Math.floor(param2 === undefined ? param1 : param2);
+	return min + Math.floor((max - min) * Math.random());
+}
+Math.randomFloat = function (param1: number, param2?: number): number {
+	const min = param2 === undefined ? 0 : param1;
+	const max = param2 === undefined ? param1 : param2;
+	return min + (max - min) * Math.random();
+}
 //#endregion
