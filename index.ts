@@ -239,7 +239,7 @@ declare global {
 		 * @param src Source object
 		 * @param preserveEmptyObject True to preserve subobjects with no keys. Default is false
 		 */
-		clean<T>(src: T, preserveEmptyObject?: boolean): void;
+		clean<T>(src: T, preserveEmptyObject?: boolean): { [K in keyof T]?: T[K] };
 	}
 	interface Math {
 		/**
@@ -683,6 +683,7 @@ Object.clean = function <T>(src: T, preserveEmptyObject: boolean = false) {
 				delete src[key];
 		}
 	}
+	return src;
 }
 //#endregion
 
