@@ -76,3 +76,62 @@ describe("copy", () => {
 		expect(replica[symbol]).toBe(true);
 	})
 });
+describe("clean", () => {
+	test("simple", () => {
+		const obj = {
+			key1: 1,
+			key2: null,
+			key3: undefined,
+			key4: true
+		};
+		Object.clean(obj);
+		expect(obj).toEqual({
+			key1: 1,
+			key4: true
+		});
+	});
+	test("nested", () => {
+		const obj = {
+			key1: 1,
+			key2: null,
+			key3: {
+				key1: null,
+				key2: true,
+				key3: {
+					key1: undefined,
+					key2: null,
+					key3: null
+				}
+			}
+		}
+		Object.clean(obj);
+		expect(obj).toEqual({
+			key1: 1,
+			key3: {
+				key2: true
+			}
+		});
+	});
+	test("preserveEmptyObject", () => {
+		const obj = {
+			key1: 1,
+			key2: null,
+			key3: {
+				key1: null,
+				key2: undefined,
+				key3: {
+					key1: undefined,
+					key2: null,
+					key3: null
+				}
+			}
+		}
+		Object.clean(obj, true);
+		expect(obj).toEqual({
+			key1: 1,
+			key3: {
+				key3: {}
+			}
+		});
+	});
+});

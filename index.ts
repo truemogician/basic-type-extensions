@@ -234,6 +234,12 @@ declare global {
 		 * @param src Source instance
 		 */
 		clone<T>(src: T): T;
+		/**
+		 * Clean null and undefined keys of an object
+		 * @param src Source object
+		 * @param preserveEmptyObject True to preserve subobjects with no keys. Default is false
+		 */
+		clean<T>(src: T, preserveEmptyObject?: boolean): void;
 	}
 	interface Math {
 		/**
@@ -667,6 +673,17 @@ Object.innerAssign = function <T>(target: T, source: any, ...sources: any[]): T 
 	return target;
 }
 Object.clone = require("lodash.clonedeep")
+Object.clean = function <T>(src: T, preserveEmptyObject: boolean = false) {
+	for (const key in src) {
+		if (src[key] === null || src[key] === undefined)
+			delete src[key];
+		else if (typeof src[key] == "object") {
+			Object.clean(src[key], preserveEmptyObject);
+			if (!preserveEmptyObject && Object.isEmpty(src[key]))
+				delete src[key];
+		}
+	}
+}
 //#endregion
 
 //#region Math
