@@ -1,4 +1,10 @@
-export { }
+export enum CleanOption {
+	Undefined = 1 << 0,
+	Null = 1 << 1,
+	EmptyObject = 1 << 2,
+	EmptyString = 1 << 3,
+	All = (1 << 4) - 1
+}
 declare global {
 	interface ArrayConstructor {
 		/**
@@ -239,7 +245,7 @@ declare global {
 		 * @param src Source object
 		 * @param preserveEmptyObject True to preserve subobjects with no keys. Default is false
 		 */
-		clean<T>(src: T, preserveEmptyObject?: boolean): { [K in keyof T]?: T[K] };
+		clean<T extends {}>(src: T, options?: CleanOption): { [K in keyof T]?: T[K] };
 	}
 	interface Math {
 		/**
@@ -672,14 +678,18 @@ Object.innerAssign = function <T>(target: T, source: any, ...sources: any[]): T 
 	}
 	return target;
 }
-Object.clone = require("lodash.clonedeep")
-Object.clean = function <T>(src: T, preserveEmptyObject: boolean = false) {
+Object.clone = require("lodash.clonedeep");
+Object.clean = function <T extends {}>(src: T, options: CleanOption = CleanOption.Null | CleanOption.Undefined) {
 	for (const key in src) {
-		if (src[key] === null || src[key] === undefined)
+		if ((options & CleanOption.Null) && src[key] === null)
+			delete src[key];
+		else if ((options & CleanOption.Undefined) && src[key] === undefined)
+			delete src[key];
+		else if ((options & CleanOption.EmptyString) && src[key] as any === "")
 			delete src[key];
 		else if (typeof src[key] == "object") {
-			Object.clean(src[key], preserveEmptyObject);
-			if (!preserveEmptyObject && Object.isEmpty(src[key]))
+			Object.clean(src[key], options);
+			if ((options & CleanOption.EmptyObject) && Object.isEmpty(src[key]))
 				delete src[key];
 		}
 	}

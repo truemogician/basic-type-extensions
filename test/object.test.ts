@@ -1,4 +1,4 @@
-import "../index"
+import { CleanOption } from "../index"
 let obj1 = {
 	key1: true,
 	key2: 1,
@@ -108,30 +108,28 @@ describe("clean", () => {
 		expect(obj).toEqual({
 			key1: 1,
 			key3: {
-				key2: true
+				key2: true,
+				key3: {}
 			}
 		});
 	});
-	test("preserveEmptyObject", () => {
+	test("empty object & empty string", () => {
 		const obj = {
 			key1: 1,
 			key2: null,
 			key3: {
-				key1: null,
+				key1: "",
 				key2: undefined,
 				key3: {
 					key1: undefined,
-					key2: null,
+					key2: "",
 					key3: null
 				}
 			}
 		}
-		Object.clean(obj, true);
+		Object.clean(obj, CleanOption.All);
 		expect(obj).toEqual({
-			key1: 1,
-			key3: {
-				key3: {}
-			}
+			key1: 1
 		});
 	});
 });
