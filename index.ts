@@ -33,6 +33,32 @@ declare global {
 		 * @returns Union result. For duplicate values, the maximum amount of which will be kept
 		 */
 		union<T = any>(...arrays: T[][]): T[];
+		/**
+		 * Create an array of integers from `begin` to `end`
+		 * @param begin Beginning number, included
+		 * @param end Ending number, included
+		 */
+		range(begin: number, end: number): number[];
+		/**
+		 * Create an array of integers from `begin` to `end`
+		 * @param begin Beginning number, included
+		 * @param end Ending number, included
+		 */
+		range(begin: number, end: number, step: number): number[];
+		/**
+		 * Create an array of integers from `begin` to `end` filtered by `predicate`
+		 * @param begin Beginning number, included
+		 * @param end Ending number, included
+		 * @param predicate Determines whether a number will be included
+		 */
+		range(begin: number, end: number, predicate: (item: number) => boolean): number[];
+		/**
+		 * Create an array of integers from `begin` to `end` filtered by `predicate`
+		 * @param begin Beginning number, included
+		 * @param end Ending number, included
+		 * @param predicate Determines whether a number will be included
+		 */
+		range(begin: number, end: number, step: number, predicate: (item: number) => boolean): number[];
 	}
 	interface Array<T> {
 		/**
@@ -352,6 +378,23 @@ Array.union = function <T = any>(...arrays: T[][]): T[] {
 		}
 	}
 	return result;
+}
+Array.range = function (begin: number, end: number, param1?: number | ((item: number) => boolean), param2?: (item: number) => boolean) {
+	const step = typeof (param1) == "number" ? param1 : 1;
+	const predicate = typeof (param1) != "number" ? param1 : param2;
+	let array: number[];
+	if (predicate) {
+		array = [];
+		for (let i = begin; i <= end; i += step)
+			if (predicate(i))
+				array.push(i);
+	}
+	else {
+		array = new Array<number>(Math.floor((end - begin + 1) / step));
+		for (let i = begin, j = 0; i <= end; i += step, ++j)
+			array[j] = i;
+	}
+	return array;
 }
 //#endregion
 //#region Array

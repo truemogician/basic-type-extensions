@@ -25,6 +25,12 @@ describe("ArrayConstructor", () => {
 			expect(Array.union(arrays[0])).toEqual(arrays[0]);
 		});
 	});
+	describe("range", () => {
+		test("default", () => expect(Array.range(1, 5)).toStrictEqual([1, 2, 3, 4, 5]));
+		test("step", () => expect(Array.range(1, 10, 3)).toStrictEqual([1, 4, 7, 10]));
+		test("filter", () => expect(Array.range(0, 4, item => (item & 1) == 0)).toStrictEqual([0, 2, 4]));
+		test("step filter", () => expect(Array.range(0, 15, 2, item => item % 3 == 0)).toStrictEqual([0, 6, 12]));
+	});
 });
 describe("Array<T>", () => {
 	describe("last", () => {
