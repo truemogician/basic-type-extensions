@@ -7,7 +7,7 @@ export enum CleanOption {
 }
 
 type DeepPartial<T extends {}> = {
-	[K in keyof T]?: T[K] extends (infer Item)[] ? (DeepPartial<Item>)[] : DeepPartial<T[K]>;
+	[K in keyof T]?: T[K] extends (infer Item)[] ? (DeepPartial<Item> | Item)[] : DeepPartial<T[K]>;
 }
 
 type StringKeyObject<TValue = any> = { [K: string]: TValue; }
