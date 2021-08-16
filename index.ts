@@ -5,6 +5,13 @@ export enum CleanOption {
 	EmptyString = 1 << 3,
 	All = (1 << 4) - 1
 }
+
+type DeepPartial<T extends {}> = {
+	[K in keyof T]?: T[K] extends (infer Item)[] ? (DeepPartial<Item>)[] : DeepPartial<T[K]>;
+}
+
+type StringKeyObject<TValue = any> = { [K: string]: TValue; }
+
 declare global {
 	interface ArrayConstructor {
 		/**
@@ -254,13 +261,13 @@ declare global {
 		 * @param target Target object
 		 * @param source Source object
 		 */
-		innerAssign<T>(target: T, source: any): T;
+		innerAssign<T extends {}>(target: T, source: DeepPartial<T> & StringKeyObject): T;
 		/**
 		 * Assign values of the common keys of `target` and `sources` from `sources` to `target`
 		 * @param target Target object
 		 * @param sources Array of source objects
 		 */
-		innerAssign<T>(target: T, ...sources: any[]): T;
+		innerAssign<T extends {}>(target: T, ...sources: (DeepPartial<T> & StringKeyObject)[]): T;
 		/**
 		 * Deep clone an instance
 		 * @param src Source instance
