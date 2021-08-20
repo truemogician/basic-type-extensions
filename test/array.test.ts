@@ -194,4 +194,11 @@ describe("Array<T>", () => {
 		await [100, 200, 600, 300].forEachAsync(num => Promise.sleep(num));
 		expect(Math.abs(Date.now() - start - 600)).toBeLessThan(10);
 	});
+	test("mapAsync", async () => {
+		const actual = await arrays[0].mapAsync(async i => {
+			await Promise.sleep(1000);
+			return i * 2;
+		});
+		expect(actual).toEqual([0, 2, 4, 6, 8]);
+	});
 });
