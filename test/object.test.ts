@@ -1,4 +1,4 @@
-import { CleanOption } from "../index"
+import { CleanOption } from "../src"
 let obj1 = {
 	key1: true,
 	key2: 1,

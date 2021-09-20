@@ -1,4 +1,4 @@
-import "../index"
+import "../src"
 
 test("sleep", async () => {
 	const start = Date.now();

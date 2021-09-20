@@ -2,7 +2,7 @@
 	"name": "basic-type-extensions",
 	"version": "1.15.0",
 	"description": "Some useful extensions for Javascript/Typescript basic types",
-	"main": "index.js",
+	"main": "lib/index.js",
 	"scripts": {
 		"test": "jest",
 		"build": "tsc",

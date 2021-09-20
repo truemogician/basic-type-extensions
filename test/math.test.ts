@@ -1,4 +1,4 @@
-import "../index"
+import "../src"
 
 test("randomInteger", () => {
 	for (let i = 0; i < 10; ++i) {

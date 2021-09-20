@@ -1,4 +1,4 @@
-import "../index"
+import "../src"
 
 describe("StringConstructor", () => {
 	test("empty", () => expect(String.isNullOrEmpty(String.empty)).toBeTruthy());
