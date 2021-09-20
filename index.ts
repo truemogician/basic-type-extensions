@@ -41,6 +41,14 @@ declare global {
 		 */
 		union<T = any>(...arrays: T[][]): T[];
 		/**
+		 * Calculate the `source` array's complement array to the `universal` array
+		 */
+		complement<T = any>(source: T[], universal: T[]): T[];
+		/**
+		 * Calculate the the source array's difference set to the target array
+		 */
+		difference<T = any>(source: T[], target: T[]): T[];
+		/**
 		 * Create an array of integers from `begin` to `end`
 		 * @param begin Beginning number, included
 		 * @param end Ending number, included
@@ -263,6 +271,14 @@ declare global {
 		 */
 		isNullOrUndefined(value: any): boolean;
 		/**
+		 * Check whether `value` has no keys or is null or undefined
+		 */
+		isNullOrEmpty(value: any): boolean;
+		/**
+		 * Check whether `value` is a primitive value
+		 */
+		isPrimitive(value: any): boolean;
+		/**
 		 * Assign values of the common keys of `target` and `source` from `source` to `target`
 		 * @param target Target object
 		 * @param source Source object
@@ -274,6 +290,11 @@ declare global {
 		 * @param sources Array of source objects
 		 */
 		innerAssign<T extends {}>(target: T, ...sources: (DeepPartial<T> & StringKeyObject)[]): T;
+		/**
+		 * Shallow copy an instance
+		 * @param src Source instance
+		 */
+		copy<T>(src: T): T;
 		/**
 		 * Deep clone an instance
 		 * @param src Source instance
@@ -389,6 +410,51 @@ Array.union = function <T = any>(...arrays: T[][]): T[] {
 			else
 				result.push(tmp2[j++]);
 		}
+	}
+	return result;
+}
+Array.complement = function <T = any>(source: T[], universal: T[]): T[] {
+	if (Object.isNullOrEmpty(source))
+		return Object.copy(universal);
+	if (Object.isNullOrEmpty(universal))
+		return null;
+	if (source.length > universal.length)
+		return null;
+	const src = Object.copy(source);
+	const dst = Object.copy(universal);
+	if (!src.isAscending())
+		src.keySort();
+	if (!dst.isAscending())
+		dst.keySort();
+	const result = new Array<T>();
+	let i = 0;
+	for (let j = 0; j < dst.length; ++j) {
+		if (i == src.length || src[i] != dst[j])
+			result.push(dst[j]);
+		else
+			++i;
+	}
+	return i == src.length ? result : null;
+}
+Array.difference = function <T = any>(source: T[], target: T[]): T[] {
+	if (Object.isNullOrEmpty(source))
+		return [];
+	if (Object.isNullOrEmpty(target))
+		return Object.copy(source);
+	const src = Object.copy(source);
+	const dst = Object.copy(target);
+	if (!src.isAscending())
+		src.keySort();
+	if (!dst.isAscending())
+		dst.keySort();
+	const result = new Array<T>();
+	for (let i = 0, j = 0; i < src.length; ++i) {
+		while (j < dst.length && dst[j] < src[i])
+			++j;
+		if (j == dst.length || src[i] != dst[j])
+			result.push(src[i]);
+		else
+			++j;
 	}
 	return result;
 }
@@ -605,10 +671,10 @@ Array.prototype.forEachAsync = async function <T>(this: Array<T>, callbackfn: (v
 	})
 }
 Array.prototype.mapAsync = async function <T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any): Promise<TResult[]> {
-	const results = new Array<TResult>();
+	const results = new Array<TResult>(this.length);
 	await this.forEachAsync(async (value, index, array) => {
 		const result = await callbackfn(value, index, array);
-		results.push(result);
+		results[index] = result;
 	}, thisArg);
 	return results;
 }
@@ -733,6 +799,15 @@ Object.isEmpty = function (value: {}): boolean {
 Object.isNullOrUndefined = function (value: any): boolean {
 	return value == null || value == undefined;
 }
+Object.isNullOrEmpty = function (value: any): boolean {
+	return value == null || Object.keys(value).length == 0;
+}
+Object.isPrimitive = function (value: any): boolean {
+	if (value === null)
+		return true;
+	const type = typeof value;
+	return type != "object" && type != "function";
+}
 Object.innerAssign = function <T>(target: T, source: any, ...sources: any[]): T {
 	const keys = Object.keys(target);
 	for (const src of [source, ...sources]) {
@@ -741,6 +816,20 @@ Object.innerAssign = function <T>(target: T, source: any, ...sources: any[]): T 
 		inter.forEach(key => (target as any)[key] = src[key]);
 	}
 	return target;
+}
+Object.copy = function <T = any>(src: T): T {
+	if (src === null)
+		return null;
+	switch (typeof src) {
+		case "object":
+			let result = src.constructor();
+			Object.assign(result, src);
+			return result;
+		case "function":
+			return src.bind({});
+		default:
+			return src;
+	}
 }
 Object.clone = require("lodash.clonedeep");
 Object.clean = function <T extends {}>(src: T, options: CleanOption = CleanOption.Null | CleanOption.Undefined) {

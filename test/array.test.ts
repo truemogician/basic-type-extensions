@@ -25,6 +25,25 @@ describe("ArrayConstructor", () => {
 			expect(Array.union(arrays[0])).toEqual(arrays[0]);
 		});
 	});
+	describe("complement", () => {
+		test("normal", () => expect(Array.complement([1, 9, 2, 6], [1, 2, 3, 4, 5, 6, 7, 8, 9])).toEqual([3, 4, 5, 7, 8]));
+		test("duplicate", () => expect(Array.complement([1, 0, 0, 0, 1], [0, 1, 0, 1, 0, 1])).toEqual([1]));
+		test("same", () => expect(Array.complement(arr0, arr0)).toEqual([]));
+		test("empty", () => {
+			expect(Array.complement(null, arr0)).toEqual(arr0);
+			expect(Array.complement(arr0, null)).toEqual(null);
+		});
+		test("wrong", () => expect(Array.complement([3, 1, 2], [3, 2, 0])).toBe(null));
+	});
+	describe("difference", () => {
+		test("normal", () => expect(Array.difference([1, 9, 2, 6], [1, 9, 8, 9])).toEqual([2, 6]));
+		test("duplicate", () => expect(Array.difference([1, 0, 0, 0, 1], [0, 1, 1, 1])).toEqual([0, 0]));
+		test("same", () => expect(Array.difference(arr0, arr0)).toEqual([]));
+		test("empty", () => {
+			expect(Array.difference(null, arr0)).toEqual([]);
+			expect(Array.difference(arr0, null)).toEqual(arr0);
+		});
+	});
 	describe("range", () => {
 		test("default", () => expect(Array.range(1, 5)).toStrictEqual([1, 2, 3, 4, 5]));
 		test("step", () => expect(Array.range(1, 10, 3)).toStrictEqual([1, 4, 7, 10]));
@@ -195,10 +214,7 @@ describe("Array<T>", () => {
 		expect(Math.abs(Date.now() - start - 600)).toBeLessThan(10);
 	});
 	test("mapAsync", async () => {
-		const actual = await arrays[0].mapAsync(async i => {
-			await Promise.sleep(1000);
-			return i * 2;
-		});
+		const actual = await [0, 1, 2, 3, 4].mapAsync(i => Promise.sleep(100).then(() => i << 1));
 		expect(actual).toEqual([0, 2, 4, 6, 8]);
 	});
 });

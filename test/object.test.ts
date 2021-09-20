@@ -25,7 +25,21 @@ test("isNullOrUndefined", () => {
 	expect(Object.isNullOrUndefined(obj)).toBeTruthy();
 	expect(Object.isNullOrUndefined({})).toBeFalsy();
 	expect(Object.isNullOrUndefined(null)).toBeTruthy();
-})
+});
+test("isNullOrEmpty", () => {
+	let obj!: object;
+	expect(Object.isNullOrEmpty(obj)).toBeTruthy();
+	expect(Object.isNullOrEmpty({})).toBeTruthy();
+	expect(Object.isNullOrEmpty(null)).toBeTruthy();
+});
+test("isPrimitive", () => {
+	expect(Object.isPrimitive(123)).toBeTruthy();
+	expect(Object.isPrimitive(false)).toBeTruthy();
+	expect(Object.isPrimitive("str")).toBeTruthy();
+	expect(Object.isPrimitive({})).toBeFalsy();
+	expect(Object.isPrimitive(null)).toBeTruthy();
+	expect(Object.isPrimitive(() => { })).toBeFalsy();
+});
 test("innerAssign", () => {
 	const temp = {};
 	Object.assign(temp, obj1);
@@ -42,6 +56,26 @@ test("innerAssign", () => {
 	});
 });
 describe("copy", () => {
+	test("primitive", () => {
+		expect(Object.copy(true)).toBe(true);
+		expect(Object.copy("copy")).toBe("copy");
+		expect(Object.copy(123)).toBe(123);
+	});
+	test("object", () => {
+		const obj = [false, "1", 2, [3], { 4: null }];
+		const result = Object.copy(obj);
+		expect(result[3]).toBe(obj[3]);
+		result[4]["4"] = {};
+		expect(obj[4]["4"]).not.toBe(null);
+	});
+	test("function", () => {
+		const func = function () { };
+		const result = Object.copy(func);
+		result["key"] = "value";
+		expect(func["key"]).toBe(undefined);
+	})
+})
+describe("clone", () => {
 	test("primitive", () => {
 		expect(Object.clone(true)).toBe(true);
 		expect(Object.clone("copy")).toBe("copy");
@@ -74,7 +108,7 @@ describe("copy", () => {
 		};
 		const replica = Object.clone(obj);
 		expect(replica[symbol]).toBe(true);
-	})
+	});
 });
 describe("clean", () => {
 	test("simple", () => {
