@@ -177,7 +177,7 @@ declare global {
 		 * @param callbackfn  An asynchronous function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array
 		 * @param thisArg  An object to which the this keyword can refer in the callbackfn function. If `thisArg` is omitted, undefined is used as the this value
 		 */
-		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<void>, thisArg?: any): Promise<void>
+		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any): Promise<void>
 		/**
 		 * Calls a defined asynchronous callback function on each element of an array, and returns an array that contains the results.
 		 * @param callbackfn An asynchronous function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
@@ -510,7 +510,9 @@ Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> |
 			return false;
 	return true;
 }
-Array.prototype.forEachAsync = async function <T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<void>, thisArg?: any): Promise<void> {
+Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any): Promise<void> {
+	if (this.length == 0)
+		return Promise.resolve();
 	let finishedCount = 0;
 	return new Promise(resolve => {
 		this.forEach(async (value, index, array) => {

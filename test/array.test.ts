@@ -208,10 +208,16 @@ describe("Array<T>", () => {
 			expect(array.isDescending(num => 1 - (num & 1), num => -num)).toBeTruthy();
 		})
 	});
-	test("forEachAsync", async () => {
-		const start = Date.now();
-		await [100, 200, 600, 300].forEachAsync(num => Promise.sleep(num));
-		expect(Math.abs(Date.now() - start - 600)).toBeLessThan(10);
+	describe("forEachAsync", () => {
+		test("normal", async () => {
+			const start = Date.now();
+			await [100, 200, 600, 300].forEachAsync(num => Promise.sleep(num));
+			expect(Math.abs(Date.now() - start - 600)).toBeLessThan(10);
+		});
+		test("empty", async () => {
+			const arr = new Array<number>();
+			await arr.forEachAsync(x => Promise.sleep(x));
+		});
 	});
 	test("mapAsync", async () => {
 		const actual = await [0, 1, 2, 3, 4].mapAsync(i => Promise.sleep(100).then(() => i << 1));
