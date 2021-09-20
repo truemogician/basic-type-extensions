@@ -1,4 +1,4 @@
 /*
-!/lib/*.d.ts
-!/lib/*.js
+!/lib
+/lib/*.map
 !package.json
