@@ -113,7 +113,7 @@ describe("Array<T>", () => {
 			expect(arr).toStrictEqual(arrays[0]);
 		});
 	});
-	describe("sum & sumAsync", () => {
+	describe("sum", () => {
 		test("default", () => expect([true, 2, "3"].sum()).toBe(6));
 		test("other", () => expect(() => { [[0], { key: "value" }].sum() }).toThrow());
 		test("map", () => expect(arrays[2].sum(num => num == 1 ? 1 : 0)).toBe(3));
@@ -128,7 +128,7 @@ describe("Array<T>", () => {
 			})
 		});
 	});
-	describe("product & productAsync", () => {
+	describe("product", () => {
 		test("default", () => expect([true, 3, "5"].product()).toBe(15));
 		test("other", () => expect(() => { [[0], { key: "value" }].product() }).toThrow());
 		test("map", () => expect(arrays[2].product(num => num == 1 ? 2 : 1)).toBe(8));
@@ -158,13 +158,28 @@ describe("Array<T>", () => {
 			expect([].maximum()).toBeUndefined();
 		})
 	});
+	test("groupBy", () => {
+		const arr: Array<[number, number]> = [
+			[1, 2],
+			[1, 3],
+			[1, 6],
+			[2, 4],
+			[3, 6],
+			[3, 0]
+		];
+		const groups = arr.groupBy(x => x[0]);
+		expect(groups.size).toBe(3);
+		expect(groups.get(1)).toEqual([[1, 2], [1, 3], [1, 6]]);
+		expect(groups.get(2)).toEqual([[2, 4]]);
+		expect(groups.get(3)).toEqual([[3, 6], [3, 0]]);
+	});
 	describe("keySort", () => {
 		test("default", () => expect([1, 11, false, 2, 8, 3].keySort()).toEqual([false, 1, 2, 3, 8, 11]));
 		test("keys", () => expect(arrays[1].keySort(num => num & 1, num => num)).toEqual([4, 6, 8, 1, 1, 3]));
 	});
 	test("shuffle", () => {
-		let temp = new Array<number>();
-		Object.assign(temp, arrays[0]).shuffle();
+		let temp = Object.clone(arrays[0]);
+		temp.shuffle();
 		expect(temp.length).toBe(arrays[0].length);
 		expect(temp).not.toEqual(arrays[0]);
 		temp.forEach(num => expect(arrays[0].includes(num)).toBeTruthy());

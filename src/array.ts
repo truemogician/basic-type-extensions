@@ -134,6 +134,11 @@ declare global {
 		 */
 		maximum(...keys: ((obj: T) => any)[]): T;
 		/**
+		 * Group an array by its key
+		 * @param key Map key selector
+		 */
+		groupBy<U>(key: (obj: T) => U): Map<U, T[]>;
+		/**
 		 * Sort the array using key sort
 		 * @param keys Array of key-generation functions
 		 */
@@ -445,6 +450,18 @@ Array.prototype.maximum = function <T>(this: Array<T>, func?: Comparer<T> | Mapp
 			result = this[i];
 	}
 	return result;
+}
+Array.prototype.groupBy = function <T, U>(this: Array<T>, key: (obj: T) => U): Map<U, T[]> {
+	const map = new Map();
+	for (const item of this) {
+		const k = key(item);
+		const group = map.get(k);
+		if (group)
+			group.push(item);
+		else
+			map.set(k, [item]);
+	}
+	return map;
 }
 Array.prototype.keySort = function <T>(this: Array<T>, ...keys: Mapper<T>[]): T[] {
 	if (!this || this.length < 2)
