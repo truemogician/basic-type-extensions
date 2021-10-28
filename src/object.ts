@@ -53,11 +53,17 @@ declare global {
 		 */
 		clone<T>(src: T): T;
 		/**
-		 * Clean null and undefined keys of an object
-		 * @param src Source object
-		 * @param preserveEmptyObject True to preserve subobjects with no keys. Default is false
+		 * Clean empty properties of an object
+		 * @param src Object to clean
+		 * @param options Options to decide the kinds of properties to remove, default is null and undefined
 		 */
-		clean<T extends {}>(src: T, options?: CleanOption): { [K in keyof T]?: T[K] };
+		clean<T extends {}>(src: T, options?: CleanOption): DeepPartial<T>;
+		/**
+		 * Clean object by a predicate function
+		 * @param src Object to clean
+		 * @param predicate A function to decide whether a property should be removed
+		 */
+		clean<T extends {}>(src: T, predicate: (key: string, value: any) => boolean): DeepPartial<T>;
 	}
 }
 
@@ -100,18 +106,31 @@ Object.copy = function <T = any>(src: T): T {
 	}
 }
 Object.clone = require("lodash.clonedeep");
-Object.clean = function <T extends {}>(src: T, options: CleanOption = CleanOption.Null | CleanOption.Undefined) {
-	for (const key in src) {
-		if ((options & CleanOption.Null) && src[key] === null)
-			delete src[key];
-		else if ((options & CleanOption.Undefined) && src[key] === undefined)
-			delete src[key];
-		else if ((options & CleanOption.EmptyString) && src[key] as any === "")
-			delete src[key];
-		else if (typeof src[key] == "object") {
-			Object.clean(src[key], options);
-			if ((options & CleanOption.EmptyObject) && Object.isEmpty(src[key]))
+Object.clean = function <T extends {}>(src: T, param?: CleanOption | ((key: string, value: any) => boolean)) {
+	if (typeof param == "function") {
+		for (const key in src) {
+			const value = src[key];
+			if (param(key, value))
 				delete src[key];
+			else if (typeof value == "object")
+				Object.clean(value, param);
+		}
+	}
+	else {
+		const options: CleanOption = param ?? (CleanOption.Null | CleanOption.Undefined);
+		for (const key in src) {
+			const value = src[key];
+			if ((options & CleanOption.Null) && value === null)
+				delete src[key];
+			else if ((options & CleanOption.Undefined) && value === undefined)
+				delete src[key];
+			else if ((options & CleanOption.EmptyString) && value as any === "")
+				delete src[key];
+			else if (typeof value == "object") {
+				Object.clean(value, options);
+				if ((options & CleanOption.EmptyObject) && Object.isEmpty(value))
+					delete src[key];
+			}
 		}
 	}
 	return src;
