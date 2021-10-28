@@ -160,10 +160,25 @@ describe("clean", () => {
 					key3: null
 				}
 			}
-		}
+		};
 		Object.clean(obj, CleanOption.All);
-		expect(obj).toEqual({
-			key1: 1
+		expect(obj).toEqual({ key1: 1 });
+	});
+	test("predicate function", () => {
+		const obj = {
+			key1: 2,
+			key2: "foo",
+			key3: () => { },
+			key4: {
+				key1: false
+			}
+		};
+		expect(Object.clean(
+			obj,
+			(key, value) => key == "key1" || typeof value == "function")
+		).toEqual({
+			key2: "foo",
+			key4: {}
 		});
 	});
 });
