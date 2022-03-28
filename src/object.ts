@@ -1,13 +1,11 @@
+import type { PartialDeep } from "type-fest";
+
 export enum CleanOption {
 	Undefined = 1 << 0,
 	Null = 1 << 1,
 	EmptyObject = 1 << 2,
 	EmptyString = 1 << 3,
 	All = (1 << 4) - 1
-}
-
-type DeepPartial<T extends {}> = {
-	[K in keyof T]?: T[K] extends (infer Item)[] ? (DeepPartial<Item> | Item)[] : DeepPartial<T[K]>;
 }
 
 type StringKeyObject<TValue = any> = { [K: string]: TValue; }
@@ -35,13 +33,13 @@ declare global {
 		 * @param target Target object
 		 * @param source Source object
 		 */
-		innerAssign<T extends object>(target: T, source: DeepPartial<T> & StringKeyObject): T;
+		innerAssign<T extends object>(target: T, source: PartialDeep<T> & StringKeyObject): T;
 		/**
 		 * Assign values of the common keys of `target` and `sources` from `sources` to `target`
 		 * @param target Target object
 		 * @param sources Array of source objects
 		 */
-		innerAssign<T extends object>(target: T, ...sources: (DeepPartial<T> & StringKeyObject)[]): T;
+		innerAssign<T extends object>(target: T, ...sources: (PartialDeep<T> & StringKeyObject)[]): T;
 		/**
 		 * Shallow copy an instance
 		 * @param src Source instance
@@ -57,13 +55,13 @@ declare global {
 		 * @param src Object to clean
 		 * @param options Options to decide the kinds of properties to remove, default is null and undefined
 		 */
-		clean<T extends object>(src: T, options?: CleanOption): DeepPartial<T>;
+		clean<T extends object>(src: T, options?: CleanOption): PartialDeep<T>;
 		/**
 		 * Clean object by a predicate function
 		 * @param src Object to clean
 		 * @param predicate A function to decide whether a property should be removed
 		 */
-		clean<T extends object>(src: T, predicate: (key: string, value: any) => boolean): DeepPartial<T>;
+		clean<T extends object>(src: T, predicate: (key: string, value: any) => boolean): PartialDeep<T>;
 		/**
 		 * Delete some properties from an object
 		 * @param src Object to remove properties from
