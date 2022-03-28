@@ -35,13 +35,13 @@ declare global {
 		 * @param target Target object
 		 * @param source Source object
 		 */
-		innerAssign<T extends {}>(target: T, source: DeepPartial<T> & StringKeyObject): T;
+		innerAssign<T extends object>(target: T, source: DeepPartial<T> & StringKeyObject): T;
 		/**
 		 * Assign values of the common keys of `target` and `sources` from `sources` to `target`
 		 * @param target Target object
 		 * @param sources Array of source objects
 		 */
-		innerAssign<T extends {}>(target: T, ...sources: (DeepPartial<T> & StringKeyObject)[]): T;
+		innerAssign<T extends object>(target: T, ...sources: (DeepPartial<T> & StringKeyObject)[]): T;
 		/**
 		 * Shallow copy an instance
 		 * @param src Source instance
@@ -57,13 +57,25 @@ declare global {
 		 * @param src Object to clean
 		 * @param options Options to decide the kinds of properties to remove, default is null and undefined
 		 */
-		clean<T extends {}>(src: T, options?: CleanOption): DeepPartial<T>;
+		clean<T extends object>(src: T, options?: CleanOption): DeepPartial<T>;
 		/**
 		 * Clean object by a predicate function
 		 * @param src Object to clean
 		 * @param predicate A function to decide whether a property should be removed
 		 */
-		clean<T extends {}>(src: T, predicate: (key: string, value: any) => boolean): DeepPartial<T>;
+		clean<T extends object>(src: T, predicate: (key: string, value: any) => boolean): DeepPartial<T>;
+		/**
+		 * Delete some properties from an object
+		 * @param src Object to remove properties from
+		 * @param keys Properties to delete
+		 */
+		delete<T extends object, K extends keyof T>(src: T, ...keys: K[]): Omit<T, K>;
+		/**
+		 * Delete some properties from an object
+		 * @param src Object to remove properties from
+		 * @param keys Properties to delete
+		 */
+		delete<T extends object, K extends keyof T>(src: T, keys: K[]): Omit<T, K>;
 	}
 }
 
@@ -82,7 +94,7 @@ Object.isPrimitive = function (value: any): boolean {
 	const type = typeof value;
 	return type != "object" && type != "function";
 }
-Object.innerAssign = function <T>(target: T, source: any, ...sources: any[]): T {
+Object.innerAssign = function <T extends object>(target: T, source: any, ...sources: any[]): T {
 	const keys = Object.keys(target);
 	for (const src of [source, ...sources]) {
 		const srcKeys = Object.keys(src);
@@ -106,14 +118,14 @@ Object.copy = function <T = any>(src: T): T {
 	}
 }
 Object.clone = require("lodash.clonedeep");
-Object.clean = function <T extends {}>(src: T, param?: CleanOption | ((key: string, value: any) => boolean)) {
+Object.clean = function <T extends object>(src: T, param?: CleanOption | ((key: string, value: any) => boolean)) {
 	if (typeof param == "function") {
 		for (const key in src) {
 			const value = src[key];
 			if (param(key, value))
 				delete src[key];
 			else if (typeof value == "object")
-				Object.clean(value, param);
+				Object.clean(value as unknown as object, param);
 		}
 	}
 	else {
@@ -127,11 +139,17 @@ Object.clean = function <T extends {}>(src: T, param?: CleanOption | ((key: stri
 			else if ((options & CleanOption.EmptyString) && value as any === "")
 				delete src[key];
 			else if (typeof value == "object") {
-				Object.clean(value, options);
+				Object.clean(value as unknown as object, options);
 				if ((options & CleanOption.EmptyObject) && Object.isEmpty(value))
 					delete src[key];
 			}
 		}
 	}
+	return src;
+}
+Object.delete = function <T extends object, K extends keyof T>(src: T, param: K | K[], ...params: K[]): Omit<T, K> {
+	const keys = param instanceof Array ? param : [param, ...params];
+	for (const key of keys)
+		delete src[key];
 	return src;
 }

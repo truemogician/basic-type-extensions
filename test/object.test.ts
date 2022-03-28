@@ -182,3 +182,23 @@ describe("clean", () => {
 		});
 	});
 });
+describe("remove", () => {
+	test("varargs", () => {
+		const obj = {
+			a: 1,
+			b: "2",
+			c: true
+		};
+		const result = Object.delete(obj, "a", "c");
+		expect(Object.keys(result)).toEqual(["b"]);
+	});
+	test("array", () => {
+		const obj = {
+			a: 1,
+			b: "2",
+			c: true
+		};
+		const result = Object.delete(obj, ["a", "b"]);
+		expect(Object.keys(result)).toEqual(["c"]);
+	});
+});
