@@ -88,6 +88,12 @@ declare global {
 		 */
 		remove(value: T): number;
 		/**
+		 * Remove all items that equals to any `values` from array
+		 * @param values Values to be remoevd
+		 * @returns The number of items removed
+		 */
+		remove(...values: T[]): number;
+		/**
 		 * Remove the item at `index` from array
 		 * @param index Index of item to be removed
 		 * @returns True if item is successfully removed
@@ -354,13 +360,22 @@ Array.prototype.insertAt = function <T>(this: Array<T>, value: T, index: number)
 	this.splice(index, 0, value);
 	return true;
 }
-Array.prototype.remove = function <T>(this: Array<T>, value: T): number {
-	let count = 0;
-	for (let i = this.length - 1; i >= 0; --i)
-		if (this[i] === value) {
-			this.splice(i, 1);
-			++count;
+Array.prototype.remove = function <T>(this: Array<T>, ...values: T[]): number {
+	const set = new Set(values);
+	const indices = new Array<number>();
+	for (let i = 0; i < this.length; ++i)
+		if (set.has(this[i]))
+			indices.push(i);
+	const count = indices.length;
+	if (count > 0) {
+		for (let i = indices[0], offset = 0; i < this.length; ++i) {
+			if (i == indices[offset])
+				++offset;
+			else
+				this[i - offset] = this[i];
 		}
+		this.length -= count;
+	}
 	return count;
 }
 Array.prototype.removeAt = function <T>(this: Array<T>, index: number): boolean {

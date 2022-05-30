@@ -90,10 +90,15 @@ describe("Array<T>", () => {
 		});
 	});
 	describe("remove", () => {
-		test("normal", () => {
+		test("single", () => {
 			const arr = Object.clone(arrays[2]);
 			expect(arr.remove(1)).toBe(3);
 			expect(arr).toStrictEqual([0, 0, 3, 9]);
+		});
+		test("multiple", () => {
+			const arr = Object.clone(arrays[2]);
+			expect(arr.remove(0, 1)).toBe(5);
+			expect(arr).toStrictEqual([3, 9]);
 		});
 		test("none", () => {
 			const arr = Object.clone(arrays[2]);
