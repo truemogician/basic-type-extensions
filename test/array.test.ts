@@ -107,10 +107,15 @@ describe("Array<T>", () => {
 		});
 	});
 	describe("removeAt", () => {
-		test("normal", () => {
+		test("single", () => {
 			const arr = Object.clone(arrays[0]);
 			expect(arr.removeAt(2)).toBe(true);
 			expect(arr).toStrictEqual([0, 1, 3, 4]);
+		});
+		test("multiple", () => {
+			const arr = Object.clone(arrays[0]);
+			expect(arr.removeAt(0, 2, 3)).toBe(true);
+			expect(arr).toStrictEqual([1, 4]);
 		});
 		test("out of range", () => {
 			const arr = Object.clone(arrays[0]);

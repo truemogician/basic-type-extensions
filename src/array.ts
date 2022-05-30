@@ -96,9 +96,15 @@ declare global {
 		/**
 		 * Remove the item at `index` from array
 		 * @param index Index of item to be removed
-		 * @returns True if item is successfully removed
+		 * @returns Whether the item is successfully removed
 		 */
 		removeAt(index: number): boolean;
+		/**
+		 * Remove items in `indices` from array
+		 * @param indices Indices of items to be removed
+		 * @returns Whether all items are successfully removed
+		 */
+		removeAt(...indices: number[]): boolean;
 		/**
 		 * Calculate the summary of the array
 		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
@@ -366,6 +372,12 @@ Array.prototype.remove = function <T>(this: Array<T>, ...values: T[]): number {
 	for (let i = 0; i < this.length; ++i)
 		if (set.has(this[i]))
 			indices.push(i);
+	this.removeAt(...indices);
+	return indices.length;
+}
+Array.prototype.removeAt = function <T>(this: Array<T>, ...indices: number[]): boolean {
+	if (indices.some(idx => idx < 0 || idx >= this.length || !Number.isSafeInteger(idx)))
+		return false;
 	const count = indices.length;
 	if (count > 0) {
 		for (let i = indices[0], offset = 0; i < this.length; ++i) {
@@ -376,12 +388,6 @@ Array.prototype.remove = function <T>(this: Array<T>, ...values: T[]): number {
 		}
 		this.length -= count;
 	}
-	return count;
-}
-Array.prototype.removeAt = function <T>(this: Array<T>, index: number): boolean {
-	if (index < 0 || index >= this.length || !Number.isSafeInteger(index))
-		return false;
-	this.splice(index, 1);
 	return true;
 }
 Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
