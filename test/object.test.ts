@@ -40,21 +40,57 @@ test("isPrimitive", () => {
 	expect(Object.isPrimitive(null)).toBeTruthy();
 	expect(Object.isPrimitive(() => { })).toBeFalsy();
 });
-test("innerAssign", () => {
-	const temp = {};
-	Object.assign(temp, obj1);
-	expect(Object.innerAssign(temp, obj2)).toEqual({
-		key1: true,
-		key2: 2,
-		key3: "b"
+describe("innerAssign", () => {
+	test("default", () => {
+		const temp = {};
+		Object.assign(temp, obj1);
+		expect(Object.innerAssign(temp, obj2)).toEqual({
+			key1: true,
+			key2: 2,
+			key3: "b"
+		});
+		Object.assign(temp, obj1);
+		expect(Object.innerAssign(temp, obj2, obj3)).toEqual({
+			key1: false,
+			key2: 3,
+			key3: "b"
+		});
 	});
-	Object.assign(temp, obj1);
-	expect(Object.innerAssign(temp, obj2, obj3)).toEqual({
-		key1: false,
-		key2: 3,
-		key3: "b"
+	class Src {
+		key1 = true;
+		get key2() { return 2; }
+		key3 = [3]
+	}
+	class Dst {
+		key1 = false;
+		key2 = 4;
+		__key3: number[] = [6];
+		set key3(value: number[]) { this.__key3 = value; }
+	}
+	const src = new Src();
+	test("getter", () => {
+		const target = new Dst();
+		Object.innerAssignWithGetter(target, src);
+		expect(target.key1).toEqual(true);
+		expect(target.key2).toEqual(2);
+		expect(target.__key3).toEqual([6]);
+	});
+	test("setter", () => {
+		const target = new Dst();
+		Object.innerAssignWithSetter(target, src);
+		expect(target.key1).toEqual(true);
+		expect(target.key2).toEqual(4);
+		expect(target.__key3).toEqual([3]);
+	});
+	test("getter & setter", () => {
+		const target = new Dst();
+		Object.innerAssignWithAccessor(target, src);
+		expect(target.key1).toEqual(true);
+		expect(target.key2).toEqual(2);
+		expect(target.__key3).toEqual([3]);
 	});
 });
+
 describe("copy", () => {
 	test("primitive", () => {
 		expect(Object.copy(true)).toBe(true);
@@ -94,7 +130,7 @@ describe("clone", () => {
 		const replica = Object.clone(obj);
 		replica[0] = false;
 		expect(obj[0]).toBe(true);
-		replica[1][3] = () => null;
+		replica[1][3] = () => 4;
 		expect(obj[1][3]()).toBe(3);
 		replica[1][4].splice(2);
 		expect(obj[1][4].length).toBe(4);
