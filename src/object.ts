@@ -29,7 +29,22 @@ declare global {
 		 */
 		isPrimitive(value: any): boolean;
 		/**
-		 * Assign values of the common keys of `target` and `source` from `source` to `target`
+		 * Returns an object containing all accessor descriptors of an object
+		 * @param object Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+		 */
+		getGetterDescriptors<T extends object>(object: T): { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor };
+		/**
+		 * Returns an object containing all accessor descriptors of an object
+		 * @param object Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+		 */
+		getSetterDescriptors<T extends object>(object: T): { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor };
+		/**
+		 * Returns an object containing all accessor descriptors of an object
+		 * @param object Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+		 */
+		getAccessorDescriptors<T extends object>(object: T): { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor };
+		/**
+		 * Assign values of the common properties of `target` and `source` from `source` to `target`
 		 * @param target Target object
 		 * @param source Source object
 		 */
@@ -91,6 +106,30 @@ Object.isPrimitive = function (value: any): boolean {
 		return true;
 	const type = typeof value;
 	return type != "object" && type != "function";
+}
+function getAccessorDescriptors<T extends object>(object: T, config: Partial<Record<"getter" | "setter", boolean>>): { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor } {
+	const result: { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor } = {};
+	do {
+		const descriptors = Object.getOwnPropertyDescriptors(object);
+		for (const key in descriptors) {
+			if (result[key] != undefined)
+				continue;
+			const descriptor = descriptors[key];
+			if (config.getter && descriptor.get || config.setter && descriptor.set)
+				(result as any)[key] = descriptor;
+		}
+		object = Object.getPrototypeOf(object);
+	} while (object)
+	return result;
+}
+Object.getGetterDescriptors = function <T extends object>(object: T): { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor } {
+	return getAccessorDescriptors(object, { getter: true });
+}
+Object.getSetterDescriptors = function <T extends object>(object: T): { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor } {
+	return getAccessorDescriptors(object, { setter: true });
+}
+Object.getAccessorDescriptors = function <T extends object>(object: T): { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor } {
+	return getAccessorDescriptors(object, { getter: true, setter: true });
 }
 Object.innerAssign = function <T extends object>(target: T, source: any, ...sources: any[]): T {
 	const keys = Object.keys(target);
