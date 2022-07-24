@@ -21,7 +21,7 @@ declare global {
 		 */
 		isNullOrUndefined(value: any): boolean;
 		/**
-		 * Check whether `value` has no keys or is null or undefined
+		 * Check whether `value` has no properties or is null or undefined
 		 */
 		isNullOrEmpty(value: any): boolean;
 		/**
@@ -50,11 +50,29 @@ declare global {
 		 */
 		innerAssign<T extends object>(target: T, source: PartialDeep<T> & StringKeyObject): T;
 		/**
-		 * Assign values of the common keys of `target` and `sources` from `sources` to `target`
+		 * Assign values of the common properties of `target` and `sources` from `sources` to `target`
 		 * @param target Target object
 		 * @param sources Array of source objects
 		 */
 		innerAssign<T extends object>(target: T, ...sources: (PartialDeep<T> & StringKeyObject)[]): T;
+		/**
+		 * Assign values of the common properties of `target` and `sources` from `sources` to `target`, getters in `sources` also included.
+		 * @param target Target object
+		 * @param sources Array of source objects
+		 */
+		innerAssignWithGetter<T extends object>(target: T, ...sources: (PartialDeep<T> & StringKeyObject)[]): T;
+		/**
+		 * Assign values of the common properties of `target` and `sources` from `sources` to `target`, setters in `target` also included.
+		 * @param target Target object
+		 * @param sources Array of source objects
+		 */
+		innerAssignWithSetter<T extends object>(target: T, ...sources: (PartialDeep<T> & StringKeyObject)[]): T;
+		/**
+		 * Assign values of the common properties of `target` and `sources` from `sources` to `target`, getters in `sources` and setters in `target` also included.
+		 * @param target Target object
+		 * @param sources Array of source objects
+		 */
+		innerAssignWithAccessor<T extends object>(target: T, ...sources: (PartialDeep<T> & StringKeyObject)[]): T;
 		/**
 		 * Shallow copy an instance
 		 * @param src Source instance
@@ -131,14 +149,40 @@ Object.getSetterDescriptors = function <T extends object>(object: T): { [P in ke
 Object.getAccessorDescriptors = function <T extends object>(object: T): { [P in keyof T]?: TypedPropertyDescriptor<T[P]> } & { [x: string]: PropertyDescriptor } {
 	return getAccessorDescriptors(object, { getter: true, setter: true });
 }
-Object.innerAssign = function <T extends object>(target: T, source: any, ...sources: any[]): T {
-	const keys = Object.keys(target);
-	for (const src of [source, ...sources]) {
-		const srcKeys = Object.keys(src);
+function innerAssign<T extends object>(target: T, config: Partial<Record<"getter" | "setter", boolean>>, sources: any[]): T {
+	const keys = Object.getOwnPropertyNames(target).filter(name => {
+		const descriptor = Object.getOwnPropertyDescriptor(target, name);
+		return descriptor.writable || config.setter && descriptor.set;
+	});
+	if (config.setter) {
+		const accessors = getAccessorDescriptors(target, { setter: true })
+		keys.push(...Object.keys(accessors));
+	}
+	for (const src of sources) {
+		const srcKeys = Object.getOwnPropertyNames(src).filter(name => {
+			const descriptor = Object.getOwnPropertyDescriptor(src, name);
+			return descriptor.get ? config.getter : !descriptor.set;
+		});
+		if (config.getter) {
+			const accessors = getAccessorDescriptors(src, { getter: true })
+			srcKeys.push(...Object.keys(accessors));
+		}
 		const inter = Array.intersection(keys, srcKeys);
 		inter.forEach(key => (target as any)[key] = src[key]);
 	}
 	return target;
+}
+Object.innerAssign = function <T extends object>(target: T, ...sources: any[]): T {
+	return innerAssign(target, {}, sources);
+}
+Object.innerAssignWithGetter = function <T extends object>(target: T, ...sources: any[]): T {
+	return innerAssign(target, { getter: true }, sources);
+}
+Object.innerAssignWithSetter = function <T extends object>(target: T, ...sources: any[]): T {
+	return innerAssign(target, { setter: true }, sources);
+}
+Object.innerAssignWithAccessor = function <T extends object>(target: T, ...sources: any[]): T {
+	return innerAssign(target, { getter: true, setter: true }, sources);
 }
 Object.copy = function <T = any>(src: T): T {
 	if (src === null)
