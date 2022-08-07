@@ -30,8 +30,8 @@ describe("ArrayConstructor", () => {
 		test("duplicate", () => expect(Array.complement([1, 0, 0, 0, 1], [0, 1, 0, 1, 0, 1])).toEqual([1]));
 		test("same", () => expect(Array.complement(arr0, arr0)).toEqual([]));
 		test("empty", () => {
-			expect(Array.complement(null, arr0)).toEqual(arr0);
-			expect(Array.complement(arr0, null)).toEqual(null);
+			expect(Array.complement([], arr0)).toEqual(arr0);
+			expect(Array.complement(arr0, [])).toEqual(null);
 		});
 		test("wrong", () => expect(Array.complement([3, 1, 2], [3, 2, 0])).toBe(null));
 	});
@@ -40,8 +40,8 @@ describe("ArrayConstructor", () => {
 		test("duplicate", () => expect(Array.difference([1, 0, 0, 0, 1], [0, 1, 1, 1])).toEqual([0, 0]));
 		test("same", () => expect(Array.difference(arr0, arr0)).toEqual([]));
 		test("empty", () => {
-			expect(Array.difference(null, arr0)).toEqual([]);
-			expect(Array.difference(arr0, null)).toEqual(arr0);
+			expect(Array.difference([], arr0)).toEqual([]);
+			expect(Array.difference(arr0, [])).toEqual(arr0);
 		});
 	});
 	describe("range", () => {
@@ -72,7 +72,7 @@ describe("Array<T>", () => {
 			expect(arr).toStrictEqual([-1, 0, 1, 2, 3, 4, 10]);
 		});
 		test("empty array", () => {
-			const arr = [];
+			const arr = new Array<number>();
 			expect(arr.insert(10)).toBe(0);
 			expect(arr).toStrictEqual([10]);
 		});
