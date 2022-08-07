@@ -87,14 +87,16 @@ declare global {
 		 * Clean empty properties of an object
 		 * @param src Object to clean
 		 * @param options Options to decide the kinds of properties to remove, default is null and undefined
+		 * @param recursive If `true`, nested objects will also be cleaned. Default is `true`
 		 */
-		clean<T extends object>(src: T, options?: CleanOption): PartialDeep<T>;
+		clean<T extends object>(src: T, options?: CleanOption, recursive?: boolean): PartialDeep<T>;
 		/**
 		 * Clean object by a predicate function
 		 * @param src Object to clean
 		 * @param predicate A function to decide whether a property should be removed
+		 * @param recursive If `true`, nested objects will also be cleaned. Default is `true`
 		 */
-		clean<T extends object>(src: T, predicate: (key: string, value: any) => boolean): PartialDeep<T>;
+		clean<T extends object>(src: T, predicate: (key: string, value: any) => boolean, recursive?: boolean): PartialDeep<T>;
 		/**
 		 * Delete some properties from an object
 		 * @param src Object to remove properties from
@@ -199,34 +201,43 @@ Object.copy = function <T = any>(src: T): T {
 	}
 }
 Object.clone = require("lodash.clonedeep");
-Object.clean = function <T extends object>(src: T, param?: CleanOption | ((key: string, value: any) => boolean)) {
+function cleanObject<T extends object>(src: T, param: CleanOption | ((key: string, value: any) => boolean), recursive: boolean, ancestors: object[]): PartialDeep<T> {
+	if (ancestors.includes(src))
+		return src as PartialDeep<T>;
 	if (typeof param == "function") {
 		for (const key in src) {
 			const value = src[key];
 			if (param(key, value))
 				delete src[key];
-			else if (typeof value == "object")
-				Object.clean(value as unknown as object, param);
+			else if (recursive && typeof value == "object") {
+				ancestors.push(src)
+				cleanObject(value as unknown as object, param, recursive, ancestors);
+				ancestors.pop();
+			}
 		}
 	}
 	else {
-		const options: CleanOption = param ?? (CleanOption.Null | CleanOption.Undefined);
 		for (const key in src) {
 			const value = src[key];
-			if ((options & CleanOption.Null) && value === null)
+			if ((param & CleanOption.Null) && value === null)
 				delete src[key];
-			else if ((options & CleanOption.Undefined) && value === undefined)
+			else if ((param & CleanOption.Undefined) && value === undefined)
 				delete src[key];
-			else if ((options & CleanOption.EmptyString) && value as any === "")
+			else if ((param & CleanOption.EmptyString) && value as any === "")
 				delete src[key];
-			else if (typeof value == "object") {
-				Object.clean(value as unknown as object, options);
-				if ((options & CleanOption.EmptyObject) && Object.isEmpty(value))
+			else if (recursive && typeof value == "object") {
+				ancestors.push(src);
+				cleanObject(value as unknown as object, param, recursive, ancestors);
+				ancestors.pop();
+				if ((param & CleanOption.EmptyObject) && Object.isEmpty(value))
 					delete src[key];
 			}
 		}
 	}
-	return src;
+	return src as PartialDeep<T>;
+}
+Object.clean = function <T extends object>(src: T, param?: CleanOption | ((key: string, value: any) => boolean), recursive?: boolean) {
+	return cleanObject(src, param ?? (CleanOption.Null | CleanOption.Undefined), recursive !== false, []);
 }
 Object.delete = function <T extends object, K extends keyof T>(src: T, param: K | K[], ...params: K[]): Omit<T, K> {
 	const keys = param instanceof Array ? param : [param, ...params];

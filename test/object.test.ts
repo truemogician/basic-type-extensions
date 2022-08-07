@@ -217,6 +217,23 @@ describe("clean", () => {
 			key4: {}
 		});
 	});
+	test("mutual reference", () => {
+		const foo = {
+			name: "foo",
+			undefined: undefined,
+			bar: null as any
+		};
+		const bar = {
+			name: "bar",
+			foo: foo,
+			null: null
+		};
+		foo.bar = bar;
+		Object.clean(foo);
+		expect(foo.bar).toBe(bar);
+		expect(Object.keys(foo)).toEqual(["name", "bar"]);
+		expect(Object.keys(bar)).toEqual(["name", "foo"]);
+	});
 });
 describe("remove", () => {
 	test("varargs", () => {
