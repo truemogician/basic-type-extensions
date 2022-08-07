@@ -5,17 +5,20 @@ declare global {
 		 * An empty string
 		 */
 		empty: string;
+
 		/**
 		 * Check whether `value` is null or empty
 		 * @param value String to be checked
 		 */
 		isNullOrEmpty(value: string | null): boolean;
+
 		/**
 		 * Check whether `value` is null or whitespace
 		 * @param value String to be checked
 		 */
 		isNullOrWhiteSpace(value: string | null): boolean;
 	}
+
 	interface String {
 		/**
 		 * Remove `length` characters from string starting at `from`
@@ -23,6 +26,7 @@ declare global {
 		 * @param length Number of characters to remove
 		 */
 		remove(from: number, length?: number): string;
+
 		/**
 		 * Split the string into two substrings
 		 * @param index Where the string will be splited at
@@ -33,6 +37,7 @@ declare global {
 		 * `"none"`: Ignore the character
 		 */
 		splitAt(index: number, charAtIndex?: "pred" | "succ" | "both" | "none"): string[];
+
 		/**
 		 * Split the string into multiple substrings
 		 * @param indices Array of indices indicating where the string will be splited at
@@ -45,13 +50,17 @@ declare global {
 		splitAt(indices: number[], charAtIndex?: "pred" | "succ" | "both" | "none"): string[]
 	}
 }
+
 String.empty = "";
+
 String.isNullOrEmpty = function (value: string | null): boolean {
 	return value == null || value == "";
 }
+
 String.isNullOrWhiteSpace = function (value: string | null): boolean {
 	return value == null || /^\s*$/.test(value);
 }
+
 String.prototype.remove = function (this: string, from: number, length?: number): string {
 	if (length && length <= 0)
 		return this;
@@ -60,6 +69,7 @@ String.prototype.remove = function (this: string, from: number, length?: number)
 	else
 		return this.substr(0, from);
 }
+
 String.prototype.splitAt = function (this: string, indices: number | number[], charAtIndex: "pred" | "succ" | "both" | "none" = "succ"): string[] {
 	if (typeof indices == "number")
 		indices = [indices];

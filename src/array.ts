@@ -1,4 +1,5 @@
 export { };
+
 declare global {
 	interface ArrayConstructor {
 		/**
@@ -8,12 +9,14 @@ declare global {
 		 * @returns Intersection result. For duplicate values, the minor amount of which will be kept
 		 */
 		intersection<T = any>(array1: T[], array2: T[]): T[];
+
 		/**
 		 * Calculate the intersection of multiple arrays
 		 * @param arrays Arrays
 		 * @returns Intersection result. For duplicate values, the minimum amount of which will be kept
 		 */
 		intersection<T = any>(...arrays: T[][]): T[];
+
 		/**
 		 * Calculate the union of two arrays
 		 * @param array1 The first array
@@ -21,32 +24,38 @@ declare global {
 		 * @returns Union result. For duplicate values, the major amount of which will be kept
 		 */
 		union<T = any>(array1: T[], array2: T[]): T[];
+
 		/**
 		 * Calculate the union of multiple arrays
 		 * @param arrays Arrays
 		 * @returns Union result. For duplicate values, the maximum amount of which will be kept
 		 */
 		union<T = any>(...arrays: T[][]): T[];
+
 		/**
 		 * Calculate the `source` array's complement array to the `universal` array
 		 */
 		complement<T = any>(source: T[], universal: T[]): T[];
+
 		/**
 		 * Calculate the the source array's difference set to the target array
 		 */
 		difference<T = any>(source: T[], target: T[]): T[];
+
 		/**
 		 * Create an array of integers from `begin` to `end`
 		 * @param begin Beginning number, included
 		 * @param end Ending number, included
 		 */
 		range(begin: number, end: number): number[];
+
 		/**
 		 * Create an array of integers from `begin` to `end`
 		 * @param begin Beginning number, included
 		 * @param end Ending number, included
 		 */
 		range(begin: number, end: number, step: number): number[];
+
 		/**
 		 * Create an array of integers from `begin` to `end` filtered by `predicate`
 		 * @param begin Beginning number, included
@@ -54,6 +63,7 @@ declare global {
 		 * @param predicate Determines whether a number will be included
 		 */
 		range(begin: number, end: number, predicate: (item: number) => boolean): number[];
+
 		/**
 		 * Create an array of integers from `begin` to `end` filtered by `predicate`
 		 * @param begin Beginning number, included
@@ -62,18 +72,21 @@ declare global {
 		 */
 		range(begin: number, end: number, step: number, predicate: (item: number) => boolean): number[];
 	}
+
 	interface Array<T> {
 		/**
 		 * Index the array backward
 		 * @param index Backward index. Default is 0
 		 */
 		last(index?: number): T;
+
 		/**
 		 * Insert a value into an ascending array using binary search
 		 * @param value Value to be inserted
 		 * @returns The index where `value` is inserted
 		 */
 		insert(value: T): number;
+
 		/**
 		 * Insert a value into specific position
 		 * @param value Value to be inserted
@@ -81,120 +94,143 @@ declare global {
 		 * @returns True if `value` is successfully inserted
 		 */
 		insertAt(value: T, index: number): boolean;
+
 		/**
 		 * Remove all items that equals to `value` from array
 		 * @param value Value to be remoevd
 		 * @returns The number of items removed
 		 */
 		remove(value: T): number;
+
 		/**
 		 * Remove all items that equals to any `values` from array
 		 * @param values Values to be remoevd
 		 * @returns The number of items removed
 		 */
 		remove(...values: T[]): number;
+
 		/**
 		 * Remove the item at `index` from array
 		 * @param index Index of item to be removed
 		 * @returns Whether the item is successfully removed
 		 */
 		removeAt(index: number): boolean;
+
 		/**
 		 * Remove items in `indices` from array
 		 * @param indices Indices of items to be removed
 		 * @returns Whether all items are successfully removed
 		 */
 		removeAt(...indices: number[]): boolean;
+
 		/**
 		 * Calculate the summary of the array
 		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
 		 */
 		sum(predicate?: (value: T) => number): number;
+
 		/**
 		 * Calculate the summary of the array
 		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited
 		 */
 		sumAsync(predicate: (value: T) => Promise<number>): Promise<number>;
+
 		/**
 		 * Calculate the product of the array
 		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
 		 */
 		product(predicate?: (value: T) => number): number;
+
 		/**
 		 * Calculate the product of the array
 		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited
 		 */
 		productAsync(predicate: (value: T) => Promise<number>): Promise<number>;
+
 		/**
 		 * Get the minimum item in array
 		 * @param compareFn Compare function
 		 */
 		minimum(compareFn?: (a: T, b: T) => number): T;
+
 		/**
 		 * Get the minimum item in array using key comparison
 		 * @param keys Array of key-generation functions
 		 */
 		minimum(...keys: ((obj: T) => any)[]): T;
+
 		/**
 		 * Get the maximum item in array
 		 * @param compareFn Compare function
 		 */
 		maximum(compareFn?: (a: T, b: T) => number): T;
+
 		/**
 		 * Get the maximum item in array using key comparison
 		 * @param keys Array of key-generation functions
 		 */
 		maximum(...keys: ((obj: T) => any)[]): T;
+
 		/**
 		 * Group an array by its key
 		 * @param key Map key selector
 		 */
 		groupBy<U>(key: (obj: T) => U): Map<U, T[]>;
+
 		/**
 		 * Sort the array using key sort
 		 * @param keys Array of key-generation functions
 		 */
 		keySort(...keys: ((obj: T) => any)[]): T[];
+
 		/**
 		 * Shuffle the array randomly
 		 */
 		shuffle(): T[];
+
 		/**
 		 * Repeat the array `count` times
 		 * @param count Default is 1, which means no repeat
 		 */
 		repeat(count?: number): T[];
+
 		/**
 		 * Check whether the array has common elements with another array
 		 * @param array Another array
 		 */
 		intersects(array: Array<T>): boolean;
+
 		/**
 		 * Check whether the array is ascending
 		 * @param predicate Compare function
 		 */
 		isAscending(predicate?: (a: T, b: T) => number): boolean;
+
 		/**
 		 * Check whether the array is ascending using key comparison
 		 * @param keys Array of key-generation functions
 		 */
 		isAscending(...keys: ((obj: T) => any)[]): boolean;
+
 		/**
 		 * Check whether the array is descending
 		 * @param predicate Compare function
 		 */
 		isDescending(predicate?: (a: T, b: T) => number): boolean;
+
 		/**
 		 * Check whether the array is descending using key comparison
 		 * @param keys Array of key-generation functions
 		 */
 		isDescending(...keys: ((obj: T) => any)[]): boolean;
+
 		/**
 		 * Performs the specified asynchronous action for each element in an array
 		 * @param callbackfn  An asynchronous function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array
 		 * @param thisArg  An object to which the this keyword can refer in the callbackfn function. If `thisArg` is omitted, undefined is used as the this value
 		 */
 		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any): Promise<void>
+
 		/**
 		 * Calls a defined asynchronous callback function on each element of an array, and returns an array that contains the results.
 		 * @param callbackfn An asynchronous function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
@@ -203,11 +239,14 @@ declare global {
 		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any): Promise<TResult[]>
 	}
 }
+
 type Comparer<T> = (a: T, b: T) => number;
 type Mapper<T, R = any> = (obj: T) => R;
+
 const defaultComparer = function <T>(a: T, b: T): number {
 	return a < b ? -1 : a > b ? 1 : 0;
 }
+
 const keyOrderComparer = function <T>(...keys: Mapper<T>[]): Comparer<T> {
 	return (a, b) => {
 		for (const key of keys) {
@@ -219,6 +258,7 @@ const keyOrderComparer = function <T>(...keys: Mapper<T>[]): Comparer<T> {
 		return 0;
 	}
 }
+
 Array.intersection = function <T = any>(...arrays: T[][]): T[] {
 	if (arrays.length == 0)
 		return null;
@@ -252,6 +292,7 @@ Array.intersection = function <T = any>(...arrays: T[][]): T[] {
 	}
 	return result;
 }
+
 Array.union = function <T = any>(...arrays: T[][]): T[] {
 	if (arrays.length == 0)
 		return null;
@@ -283,6 +324,7 @@ Array.union = function <T = any>(...arrays: T[][]): T[] {
 	}
 	return result;
 }
+
 Array.complement = function <T = any>(source: T[], universal: T[]): T[] {
 	if (Object.isNullOrEmpty(source))
 		return Object.copy(universal);
@@ -306,6 +348,7 @@ Array.complement = function <T = any>(source: T[], universal: T[]): T[] {
 	}
 	return i == src.length ? result : null;
 }
+
 Array.difference = function <T = any>(source: T[], target: T[]): T[] {
 	if (Object.isNullOrEmpty(source))
 		return [];
@@ -328,6 +371,7 @@ Array.difference = function <T = any>(source: T[], target: T[]): T[] {
 	}
 	return result;
 }
+
 Array.range = function (begin: number, end: number, param1?: number | ((item: number) => boolean), param2?: (item: number) => boolean) {
 	const step = typeof (param1) == "number" ? param1 : 1;
 	const predicate = typeof (param1) != "number" ? param1 : param2;
@@ -345,9 +389,11 @@ Array.range = function (begin: number, end: number, param1?: number | ((item: nu
 	}
 	return array;
 }
+
 Array.prototype.last = function <T>(this: Array<T>, index: number = 0): T {
 	return this[this.length - index - 1];
 }
+
 Array.prototype.insert = function <T>(this: Array<T>, value: T): number {
 	let l = 0, r = this.length - 1, m;
 	while (l <= r) {
@@ -360,12 +406,14 @@ Array.prototype.insert = function <T>(this: Array<T>, value: T): number {
 	this.splice(l, 0, value);
 	return l;
 }
+
 Array.prototype.insertAt = function <T>(this: Array<T>, value: T, index: number): boolean {
 	if (index < 0 || index >= this.length || !Number.isSafeInteger(index))
 		return false;
 	this.splice(index, 0, value);
 	return true;
 }
+
 Array.prototype.remove = function <T>(this: Array<T>, ...values: T[]): number {
 	const set = new Set(values);
 	const indices = new Array<number>();
@@ -375,6 +423,7 @@ Array.prototype.remove = function <T>(this: Array<T>, ...values: T[]): number {
 	this.removeAt(...indices);
 	return indices.length;
 }
+
 Array.prototype.removeAt = function <T>(this: Array<T>, ...indices: number[]): boolean {
 	if (indices.some(idx => idx < 0 || idx >= this.length || !Number.isSafeInteger(idx)))
 		return false;
@@ -390,6 +439,7 @@ Array.prototype.removeAt = function <T>(this: Array<T>, ...indices: number[]): b
 	}
 	return true;
 }
+
 Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
 	let result = 0;
 	if (!predicate)
@@ -404,6 +454,7 @@ Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => num
 	this.forEach(value => result += predicate!(value));
 	return result;
 }
+
 Array.prototype.sumAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>): Promise<number> {
 	let result = 0;
 	let count = 0;
@@ -418,6 +469,7 @@ Array.prototype.sumAsync = async function <T>(this: Array<T>, predicate: (value:
 		});
 	});
 }
+
 Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
 	let result = 1;
 	if (!predicate)
@@ -432,6 +484,7 @@ Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) =>
 	this.forEach(value => result *= predicate!(value));
 	return result;
 }
+
 Array.prototype.productAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>): Promise<number> {
 	let result = 1;
 	let count = 0;
@@ -446,6 +499,7 @@ Array.prototype.productAsync = async function <T>(this: Array<T>, predicate: (va
 		});
 	});
 }
+
 Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]) {
 	if (!this?.length)
 		return undefined;
@@ -459,6 +513,7 @@ Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Mapp
 	}
 	return result;
 }
+
 Array.prototype.maximum = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]) {
 	if (!this?.length)
 		return undefined;
@@ -472,6 +527,7 @@ Array.prototype.maximum = function <T>(this: Array<T>, func?: Comparer<T> | Mapp
 	}
 	return result;
 }
+
 Array.prototype.groupBy = function <T, U>(this: Array<T>, key: (obj: T) => U): Map<U, T[]> {
 	const map = new Map();
 	for (const item of this) {
@@ -484,12 +540,14 @@ Array.prototype.groupBy = function <T, U>(this: Array<T>, key: (obj: T) => U): M
 	}
 	return map;
 }
+
 Array.prototype.keySort = function <T>(this: Array<T>, ...keys: Mapper<T>[]): T[] {
 	if (!this || this.length < 2)
 		return this;
 	const compare = keys?.length ? keyOrderComparer(...keys) : defaultComparer;
 	return this.sort(compare);
 }
+
 Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
 	let temp: T;
 	for (let i = this.length, j; i > 0;) {
@@ -501,6 +559,7 @@ Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
 	}
 	return this;
 }
+
 Array.prototype.repeat = function <T>(this: Array<T>, count: number = 1): T[] {
 	if (count < 0)
 		return null;
@@ -512,6 +571,7 @@ Array.prototype.repeat = function <T>(this: Array<T>, count: number = 1): T[] {
 	}
 	return result;
 }
+
 Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): boolean {
 	let tmp1 = new Array<T>(), tmp2 = new Array<T>();
 	Object.assign(tmp1, this);
@@ -530,6 +590,7 @@ Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): bool
 	}
 	return false;
 }
+
 Array.prototype.isAscending = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]): boolean {
 	let compare: Comparer<T> = !func
 		? defaultComparer
@@ -539,6 +600,7 @@ Array.prototype.isAscending = function <T>(this: Array<T>, func?: Comparer<T> | 
 			return false;
 	return true;
 }
+
 Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]): boolean {
 	let compare: Comparer<T> = !func
 		? defaultComparer
@@ -548,6 +610,7 @@ Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> |
 			return false;
 	return true;
 }
+
 Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any): Promise<void> {
 	if (this.length == 0)
 		return Promise.resolve();
@@ -561,6 +624,7 @@ Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: 
 		}, thisArg)
 	})
 }
+
 Array.prototype.mapAsync = async function <T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any): Promise<TResult[]> {
 	const results = new Array<TResult>(this.length);
 	await this.forEachAsync(async (value, index, array) => {
