@@ -1,69 +1,95 @@
 import "../src";
+
 const arrays = [
 	[0, 1, 2, 3, 4],
 	[1, 1, 3, 4, 6, 8],
 	[0, 0, 1, 1, 1, 3, 9],
 	[1, 1, 3, 7],
 ];
+
 describe("ArrayConstructor", () => {
 	let arr0 = new Array<number>(), arr1 = new Array<number>();
 	Object.assign(arr0, arrays[0]).shuffle();
 	Object.assign(arr1, arrays[1]).shuffle();
+
 	describe("intersection", () => {
 		test("two", () => expect(Array.intersection(arr0, arr1)).toEqual([1, 3, 4]));
+
 		test("multiple", () => expect(Array.intersection(...arrays.slice(1))).toEqual([1, 1, 3]));
+
 		test("one and empty", () => {
 			expect(Array.intersection()).toBeNull();
 			expect(Array.intersection(arrays[0])).toEqual(arrays[0]);
 		});
 	});
+
 	describe("union", () => {
 		test("two", () => expect(Array.union(arr0, arr1)).toEqual([0, 1, 1, 2, 3, 4, 6, 8]));
+
 		test("multiple", () => expect(Array.union(...arrays)).toEqual([0, 0, 1, 1, 1, 2, 3, 4, 6, 7, 8, 9]));
+
 		test("one and empty", () => {
 			expect(Array.union()).toBeNull();
 			expect(Array.union(arrays[0])).toEqual(arrays[0]);
 		});
 	});
+
 	describe("complement", () => {
 		test("normal", () => expect(Array.complement([1, 9, 2, 6], [1, 2, 3, 4, 5, 6, 7, 8, 9])).toEqual([3, 4, 5, 7, 8]));
+
 		test("duplicate", () => expect(Array.complement([1, 0, 0, 0, 1], [0, 1, 0, 1, 0, 1])).toEqual([1]));
+
 		test("same", () => expect(Array.complement(arr0, arr0)).toEqual([]));
+
 		test("empty", () => {
 			expect(Array.complement([], arr0)).toEqual(arr0);
 			expect(Array.complement(arr0, [])).toEqual(null);
 		});
+
 		test("wrong", () => expect(Array.complement([3, 1, 2], [3, 2, 0])).toBe(null));
 	});
+
 	describe("difference", () => {
 		test("normal", () => expect(Array.difference([1, 9, 2, 6], [1, 9, 8, 9])).toEqual([2, 6]));
+
 		test("duplicate", () => expect(Array.difference([1, 0, 0, 0, 1], [0, 1, 1, 1])).toEqual([0, 0]));
+
 		test("same", () => expect(Array.difference(arr0, arr0)).toEqual([]));
+
 		test("empty", () => {
 			expect(Array.difference([], arr0)).toEqual([]);
 			expect(Array.difference(arr0, [])).toEqual(arr0);
 		});
 	});
+
 	describe("range", () => {
 		test("default", () => expect(Array.range(1, 5)).toStrictEqual([1, 2, 3, 4, 5]));
+
 		test("step", () => expect(Array.range(1, 10, 3)).toStrictEqual([1, 4, 7, 10]));
+
 		test("filter", () => expect(Array.range(0, 4, item => (item & 1) == 0)).toStrictEqual([0, 2, 4]));
+
 		test("step filter", () => expect(Array.range(0, 15, 2, item => item % 3 == 0)).toStrictEqual([0, 6, 12]));
 	});
 });
 describe("Array<T>", () => {
 	describe("last", () => {
 		test("default", () => expect(arrays[0].last()).toBe(4));
+
 		test("regular", () => expect(arrays[0].last(3)).toBe(1));
+
 		test("negative", () => expect(arrays[0].last(-1)).toBeUndefined());
+
 		test("overflow", () => expect(arrays[0].last(100)).toBeUndefined());
 	});
+
 	describe("insert", () => {
 		test("normal", () => {
 			const arr = Object.clone(arrays[0]);
 			expect(arr.insert(3)).toBe(3);
 			expect(arr).toStrictEqual([0, 1, 2, 3, 3, 4]);
 		});
+
 		test("border", () => {
 			const arr = Object.clone(arrays[0]);
 			expect(arr.insert(10)).toBe(5);
@@ -71,62 +97,75 @@ describe("Array<T>", () => {
 			expect(arr.insert(-1)).toBe(0);
 			expect(arr).toStrictEqual([-1, 0, 1, 2, 3, 4, 10]);
 		});
+
 		test("empty array", () => {
 			const arr = new Array<number>();
 			expect(arr.insert(10)).toBe(0);
 			expect(arr).toStrictEqual([10]);
 		});
 	});
+
 	describe("insertAt", () => {
 		test("normal", () => {
 			const arr = Object.clone(arrays[0]);
 			expect(arr.insertAt(-1, 3)).toBe(true);
 			expect(arr).toStrictEqual([0, 1, 2, -1, 3, 4]);
 		});
+
 		test("out of range", () => {
 			const arr = Object.clone(arrays[0]);
 			expect(arr.insertAt(-1, 10)).toBe(false);
 			expect(arr).toStrictEqual(arrays[0]);
 		});
 	});
+
 	describe("remove", () => {
 		test("single", () => {
 			const arr = Object.clone(arrays[2]);
 			expect(arr.remove(1)).toBe(3);
 			expect(arr).toStrictEqual([0, 0, 3, 9]);
 		});
+
 		test("multiple", () => {
 			const arr = Object.clone(arrays[2]);
 			expect(arr.remove(0, 1)).toBe(5);
 			expect(arr).toStrictEqual([3, 9]);
 		});
+
 		test("none", () => {
 			const arr = Object.clone(arrays[2]);
 			expect(arr.remove(10)).toBe(0);
 			expect(arr).toStrictEqual(arrays[2]);
 		});
 	});
+
 	describe("removeAt", () => {
 		test("single", () => {
 			const arr = Object.clone(arrays[0]);
 			expect(arr.removeAt(2)).toBe(true);
 			expect(arr).toStrictEqual([0, 1, 3, 4]);
 		});
+
 		test("multiple", () => {
 			const arr = Object.clone(arrays[0]);
 			expect(arr.removeAt(0, 2, 3)).toBe(true);
 			expect(arr).toStrictEqual([1, 4]);
 		});
+
 		test("out of range", () => {
 			const arr = Object.clone(arrays[0]);
 			expect(arr.removeAt(10)).toBe(false);
 			expect(arr).toStrictEqual(arrays[0]);
 		});
 	});
+
 	describe("sum", () => {
 		test("default", () => expect([true, 2, "3"].sum()).toBe(6));
+
 		test("other", () => expect(() => { [[0], { key: "value" }].sum() }).toThrow());
+
 		test("map", () => expect(arrays[2].sum(num => num == 1 ? 1 : 0)).toBe(3));
+
 		test("async", () => {
 			const duration = 500;
 			const start = Date.now();
@@ -138,10 +177,14 @@ describe("Array<T>", () => {
 			})
 		});
 	});
+
 	describe("product", () => {
 		test("default", () => expect([true, 3, "5"].product()).toBe(15));
+
 		test("other", () => expect(() => { [[0], { key: "value" }].product() }).toThrow());
+
 		test("map", () => expect(arrays[2].product(num => num == 1 ? 2 : 1)).toBe(8));
+
 		test("async", async () => {
 			const duration = 500;
 			const start = Date.now();
@@ -153,21 +196,25 @@ describe("Array<T>", () => {
 			})
 		});
 	});
+
 	describe("minimum & maximum", () => {
 		test("default", () => {
 			const array = [true, 5, 2, false];
 			expect(array.minimum()).toBe(false);
 			expect(array.maximum()).toBe(5);
 		});
+
 		test("keys", () => {
 			expect(arrays[1].minimum(num => num & 1, num => -num)).toBe(8);
 			expect(arrays[1].maximum(num => num & 1, num => -num)).toBe(1);
 		});
+
 		test("undefined", () => {
 			expect([].minimum()).toBeUndefined();
 			expect([].maximum()).toBeUndefined();
 		})
 	});
+
 	test("groupBy", () => {
 		const arr: Array<[number, number]> = [
 			[1, 2],
@@ -183,10 +230,13 @@ describe("Array<T>", () => {
 		expect(groups.get(2)).toEqual([[2, 4]]);
 		expect(groups.get(3)).toEqual([[3, 6], [3, 0]]);
 	});
+
 	describe("keySort", () => {
 		test("default", () => expect([1, 11, false, 2, 8, 3].keySort()).toEqual([false, 1, 2, 3, 8, 11]));
+
 		test("keys", () => expect(arrays[1].keySort(num => num & 1, num => num)).toEqual([4, 6, 8, 1, 1, 3]));
 	});
+
 	test("shuffle", () => {
 		let temp = Object.clone(arrays[0]);
 		temp.shuffle();
@@ -194,15 +244,20 @@ describe("Array<T>", () => {
 		expect(temp).not.toEqual(arrays[0]);
 		temp.forEach(num => expect(arrays[0].includes(num)).toBeTruthy());
 	});
+
 	describe("repeat", () => {
 		const arr = [1, 2];
+
 		test("default", () => expect(arr.repeat()).toEqual([1, 2]));
+
 		test("normal", () => expect(arr.repeat(3)).toEqual([1, 2, 1, 2, 1, 2]));
+
 		test("zero and negative", () => {
 			expect(arr.repeat(0)).toEqual([]);
 			expect(arr.repeat(-2)).toBeNull();
 		});
 	});
+
 	describe("intersects", () => {
 		test("normal", () => {
 			const arr1 = [1, 9, 2, 6];
@@ -210,11 +265,13 @@ describe("Array<T>", () => {
 			expect(arr1.intersects(arr2)).toBeTruthy();
 			expect(arr1.slice(1).intersects(arr2)).toBeFalsy();
 		});
+
 		test("empty", () => {
 			expect(arrays[0].intersects([])).toBeFalsy();
 			expect([].intersects([])).toBeFalsy();
 		})
 	});
+
 	describe("isAscending & isDescending", () => {
 		test("normal", () => {
 			expect(arrays[0].isAscending()).toBeTruthy();
@@ -222,17 +279,20 @@ describe("Array<T>", () => {
 			expect([1, 9, 2, 6].isAscending()).toBeFalsy();
 			expect([1, 9, 2, 6].isDescending()).toBeFalsy();
 		});
+
 		test("constant", () => {
 			const array = [1, 1, 1, 1, 1, 1];
 			expect(array.isAscending()).toBeTruthy();
 			expect(array.isDescending()).toBeTruthy();
 		});
+
 		test("keys", () => {
 			const array = [0, 2, 4, 1, 7, 9];
 			expect(array.isAscending(num => num & 1, num => num)).toBeTruthy();
 			expect(array.isDescending(num => 1 - (num & 1), num => -num)).toBeTruthy();
 		})
 	});
+
 	describe("forEachAsync", () => {
 		test("normal", async () => {
 			const start = Date.now();
@@ -244,6 +304,7 @@ describe("Array<T>", () => {
 			await arr.forEachAsync(x => Promise.sleep(x));
 		});
 	});
+
 	test("mapAsync", async () => {
 		const actual = await [0, 1, 2, 3, 4].mapAsync(i => Promise.sleep(100).then(() => i << 1));
 		expect(actual).toEqual([0, 2, 4, 6, 8]);

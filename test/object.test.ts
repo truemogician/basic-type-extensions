@@ -1,4 +1,5 @@
 import { CleanOption } from "../src"
+
 let obj1 = {
 	key1: true,
 	key2: 1,
@@ -14,24 +15,28 @@ let obj3 = {
 	key2: 3,
 	key5: {}
 };
+
 test("isEmpty", () => {
 	expect(Object.isEmpty([])).toBeTruthy();
 	expect(Object.isEmpty({})).toBeTruthy();
 	expect(Object.isEmpty(["a"])).toBeFalsy();
 	expect(Object.isEmpty(123)).toBeTruthy();
 });
+
 test("isNullOrUndefined", () => {
 	let obj!: object;
 	expect(Object.isNullOrUndefined(obj)).toBeTruthy();
 	expect(Object.isNullOrUndefined({})).toBeFalsy();
 	expect(Object.isNullOrUndefined(null)).toBeTruthy();
 });
+
 test("isNullOrEmpty", () => {
 	let obj!: object;
 	expect(Object.isNullOrEmpty(obj)).toBeTruthy();
 	expect(Object.isNullOrEmpty({})).toBeTruthy();
 	expect(Object.isNullOrEmpty(null)).toBeTruthy();
 });
+
 test("isPrimitive", () => {
 	expect(Object.isPrimitive(123)).toBeTruthy();
 	expect(Object.isPrimitive(false)).toBeTruthy();
@@ -40,6 +45,7 @@ test("isPrimitive", () => {
 	expect(Object.isPrimitive(null)).toBeTruthy();
 	expect(Object.isPrimitive(() => { })).toBeFalsy();
 });
+
 describe("innerAssign", () => {
 	test("default", () => {
 		const temp = {};
@@ -56,6 +62,7 @@ describe("innerAssign", () => {
 			key3: "b"
 		});
 	});
+
 	class Src {
 		key1 = true;
 		get key2() { return 2; }
@@ -68,6 +75,7 @@ describe("innerAssign", () => {
 		set key3(value: number[]) { this.__key3 = value; }
 	}
 	const src = new Src();
+
 	test("getter", () => {
 		const target = new Dst();
 		Object.innerAssignWithGetter(target, src);
@@ -75,6 +83,7 @@ describe("innerAssign", () => {
 		expect(target.key2).toEqual(2);
 		expect(target.__key3).toEqual([6]);
 	});
+
 	test("setter", () => {
 		const target = new Dst();
 		Object.innerAssignWithSetter(target, src);
@@ -82,6 +91,7 @@ describe("innerAssign", () => {
 		expect(target.key2).toEqual(4);
 		expect(target.__key3).toEqual([3]);
 	});
+
 	test("getter & setter", () => {
 		const target = new Dst();
 		Object.innerAssignWithAccessor(target, src);
@@ -97,6 +107,7 @@ describe("copy", () => {
 		expect(Object.copy("copy")).toBe("copy");
 		expect(Object.copy(123)).toBe(123);
 	});
+
 	test("object", () => {
 		const obj = [false, "1", 2, [3], { 4: null }];
 		const result = Object.copy(obj);
@@ -104,6 +115,7 @@ describe("copy", () => {
 		result[4]["4"] = {};
 		expect(obj[4]["4"]).not.toBe(null);
 	});
+
 	test("function", () => {
 		const func = function () { };
 		const result = Object.copy(func);
@@ -111,13 +123,16 @@ describe("copy", () => {
 		expect(func["key"]).toBe(undefined);
 	})
 })
+
 describe("clone", () => {
 	test("primitive", () => {
 		expect(Object.clone(true)).toBe(true);
 		expect(Object.clone("copy")).toBe("copy");
 		expect(Object.clone(123)).toBe(123);
 	});
+
 	test("object", () => expect(Object.clone(obj1)).toEqual(obj1));
+
 	test("nested", () => {
 		const obj = {
 			0: true,
@@ -135,6 +150,7 @@ describe("clone", () => {
 		replica[1][4].splice(2);
 		expect(obj[1][4].length).toBe(4);
 	});
+
 	test("symbol", () => {
 		const symbol = Symbol(0);
 		const obj = {
@@ -146,6 +162,7 @@ describe("clone", () => {
 		expect(replica[symbol]).toBe(true);
 	});
 });
+
 describe("clean", () => {
 	test("simple", () => {
 		const obj = {
@@ -160,6 +177,7 @@ describe("clean", () => {
 			key4: true
 		});
 	});
+
 	test("nested", () => {
 		const obj = {
 			key1: 1,
@@ -183,6 +201,7 @@ describe("clean", () => {
 			}
 		});
 	});
+
 	test("empty object & empty string", () => {
 		const obj = {
 			key1: 1,
@@ -200,6 +219,7 @@ describe("clean", () => {
 		Object.clean(obj, CleanOption.All);
 		expect(obj).toEqual({ key1: 1 });
 	});
+
 	test("predicate function", () => {
 		const obj = {
 			key1: 2,
@@ -217,6 +237,7 @@ describe("clean", () => {
 			key4: {}
 		});
 	});
+
 	test("mutual reference", () => {
 		const foo = {
 			name: "foo",
@@ -235,6 +256,7 @@ describe("clean", () => {
 		expect(Object.keys(bar)).toEqual(["name", "foo"]);
 	});
 });
+
 describe("remove", () => {
 	test("varargs", () => {
 		const obj = {
@@ -245,6 +267,7 @@ describe("remove", () => {
 		const result = Object.delete(obj, "a", "c");
 		expect(Object.keys(result)).toEqual(["b"]);
 	});
+
 	test("array", () => {
 		const obj = {
 			a: 1,

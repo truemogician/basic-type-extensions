@@ -11,6 +11,7 @@ test("randomInteger", () => {
 	}
 	expect(Math.randomInteger(2, 3)).toBe(2);
 });
+
 test("randomFloat", () => {
 	for (let i = 0; i < 10; ++i) {
 		let rand = Math.randomFloat(2);

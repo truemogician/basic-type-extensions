@@ -6,8 +6,10 @@ test("sleep", async () => {
 	await Promise.sleep(duration);
 	expect(Math.abs(Date.now() - start - duration)).toBeLessThan(50);
 });
+
 describe("wait", () => {
 	const duration = 500;
+
 	test("default", async () => {
 		let flag = false;
 		const start = Date.now();
@@ -18,6 +20,7 @@ describe("wait", () => {
 			expect(Date.now() - start).toBeGreaterThan(duration);
 		});
 	});
+
 	test("async", async () => {
 		let flag = false;
 		const start = Date.now();
@@ -28,6 +31,7 @@ describe("wait", () => {
 			expect(Date.now() - start).toBeGreaterThan(duration);
 		});
 	});
+
 	test("timeout", async () => {
 		let flag = false;
 		Promise.sleep(duration).then(() => flag = true);
@@ -42,6 +46,7 @@ describe("wait", () => {
 			expect(Date.now() - start).toBeLessThan(duration + 200);
 		});
 	});
+
 	test("arguments", async () => {
 		let flag = false;
 		const start = Date.now();
