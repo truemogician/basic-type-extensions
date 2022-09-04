@@ -1,4 +1,13 @@
-export { };
+/**
+ * Options to control asynchronious array operations
+ */
+export interface AsyncOptions {
+	/**
+	 * Maximum number of promises to evaluate in parallel
+	 * If undefined or less than 1, all promises will be evaluated in parallel
+	 */
+	maxConcurrency?: number;
+}
 
 declare global {
 	interface ArrayConstructor {
@@ -132,8 +141,9 @@ declare global {
 		/**
 		 * Calculate the summary of the array
 		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited
+		 * @param options Asynchronous operation options
 		 */
-		sumAsync(predicate: (value: T) => Promise<number>): Promise<number>;
+		sumAsync(predicate: (value: T) => Promise<number>, options?: AsyncOptions): Promise<number>;
 
 		/**
 		 * Calculate the product of the array
@@ -142,10 +152,11 @@ declare global {
 		product(predicate?: (value: T) => number): number;
 
 		/**
-		 * Calculate the product of the array
-		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited
+		 * Calculate the product of the array.
+		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited.
+		 * @param options Asynchronous operation options.
 		 */
-		productAsync(predicate: (value: T) => Promise<number>): Promise<number>;
+		productAsync(predicate: (value: T) => Promise<number>, options?: AsyncOptions): Promise<number>;
 
 		/**
 		 * Get the minimum item in array
@@ -228,15 +239,17 @@ declare global {
 		 * Performs the specified asynchronous action for each element in an array
 		 * @param callbackfn  An asynchronous function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array
 		 * @param thisArg  An object to which the this keyword can refer in the callbackfn function. If `thisArg` is omitted, undefined is used as the this value
+		 * @param options Asynchronous operation options
 		 */
-		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any): Promise<void>
+		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any, options?: AsyncOptions): Promise<void>
 
 		/**
-		 * Calls a defined asynchronous callback function on each element of an array, and returns an array that contains the results.
-		 * @param callbackfn An asynchronous function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array.
-		 * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
+		 * Calls a defined asynchronous callback function on each element of an array, and returns an array that contains the results
+		 * @param callbackfn An asynchronous function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array
+		 * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value
+		 * @param options Asynchronous operation options
 		 */
-		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any): Promise<TResult[]>
+		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]>
 	}
 }
 
@@ -455,19 +468,12 @@ Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => num
 	return result;
 }
 
-Array.prototype.sumAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>): Promise<number> {
+Array.prototype.sumAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>, options?: AsyncOptions): Promise<number> {
 	let result = 0;
-	let count = 0;
-	return new Promise<number>(resolve => {
-		this.forEach(value => {
-			predicate(value).then(res => {
-				result += res;
-				++count;
-				if (count == this.length)
-					resolve(result);
-			});
-		});
-	});
+	await this.forEachAsync(async value => {
+		result += await predicate(value);
+	}, null, options);
+	return result;
 }
 
 Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
@@ -485,19 +491,12 @@ Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) =>
 	return result;
 }
 
-Array.prototype.productAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>): Promise<number> {
+Array.prototype.productAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>, options?: AsyncOptions): Promise<number> {
 	let result = 1;
-	let count = 0;
-	return new Promise<number>(resolve => {
-		this.forEach(value => {
-			predicate(value).then(res => {
-				result *= res;
-				++count;
-				if (count == this.length)
-					resolve(result);
-			});
-		});
-	});
+	await this.forEachAsync(async value => {
+		result *= await predicate(value);
+	}, null, options);
+	return result;
 }
 
 Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]) {
@@ -611,25 +610,43 @@ Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> |
 	return true;
 }
 
-Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any): Promise<void> {
+Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any, options?: AsyncOptions): Promise<void> {
 	if (this.length == 0)
 		return Promise.resolve();
-	let finishedCount = 0;
 	return new Promise(resolve => {
-		this.forEach(async (value, index, array) => {
-			await callbackfn(value, index, array);
-			++finishedCount;
-			if (finishedCount == this.length)
-				resolve();
-		}, thisArg)
-	})
+		let finished = 0;
+		if (options?.maxConcurrency >= 1 && this.length > options?.maxConcurrency) {
+			let index = 0;
+			const execute = async () => {
+				const idx = index++;
+				if (idx >= this.length)
+					return;
+				await callbackfn.call(thisArg, this[idx], idx, this);
+				++finished;
+				if (finished == this.length)
+					resolve();
+				else
+					execute();
+			}
+			for (let i = 0; i < options.maxConcurrency; ++i)
+				execute();
+		}
+		else {
+			this.forEach(async (value, index, array) => {
+				await callbackfn(value, index, array);
+				++finished;
+				if (finished == this.length)
+					resolve();
+			}, thisArg)
+		}
+	});
 }
 
-Array.prototype.mapAsync = async function <T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any): Promise<TResult[]> {
+Array.prototype.mapAsync = async function <T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]> {
 	const results = new Array<TResult>(this.length);
 	await this.forEachAsync(async (value, index, array) => {
 		const result = await callbackfn(value, index, array);
 		results[index] = result;
-	}, thisArg);
+	}, thisArg, options);
 	return results;
 }

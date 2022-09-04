@@ -303,10 +303,24 @@ describe("Array<T>", () => {
 			const arr = new Array<number>();
 			await arr.forEachAsync(x => Promise.sleep(x));
 		});
+		test("max concurrency", async () => {
+			const arr = [200, 300, 800, 600];
+			const start = Date.now();
+			await arr.forEachAsync(Promise.sleep, null, { maxConcurrency: 2 });
+			expect(Math.abs(Date.now() - start - 1000)).toBeLessThan(50);
+		});
+		test("sequential", async () => {
+			const arr = [100, 400, 200, 300];
+			const start = Date.now();
+			await arr.forEachAsync(Promise.sleep, null, { maxConcurrency: 1 });
+			expect(Math.abs(Date.now() - start - 1000)).toBeLessThan(50);
+		});
 	});
 
-	test("mapAsync", async () => {
-		const actual = await [0, 1, 2, 3, 4].mapAsync(i => Promise.sleep(100).then(() => i << 1));
-		expect(actual).toEqual([0, 2, 4, 6, 8]);
+	describe("mapAsync", () => {
+		test("normal", async () => {
+			const actual = await [0, 1, 2, 3, 4].mapAsync(i => Promise.sleep(100).then(() => i << 1));
+			expect(actual).toEqual([0, 2, 4, 6, 8]);
+		});
 	});
 });
