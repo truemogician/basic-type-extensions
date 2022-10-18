@@ -101,6 +101,47 @@ describe("innerAssign", () => {
 	});
 });
 
+describe("rightAssign", () => {
+	test("default", () => {
+		const temp = {
+			key1: false,
+			key4: "4"
+		};
+		expect(Object.rightAssign(temp, obj1)).toEqual({
+			key1: true,
+			key2: 1,
+			key3: "a",
+			key4: "4"
+		});
+	});
+
+	test("nested", () => {
+		const target = {
+			key1: true,
+			key2: {
+				key3: 3,
+				key4: "4"
+			}
+		}
+		const source = {
+			key2: {
+				key3: 33,
+				key5: [5]
+			},
+			key6: {}
+		};
+		expect(Object.rightAssign(target, source, { nested: true })).toEqual({
+			key1: true,
+			key2: {
+				key3: 33,
+				key4: "4",
+				key5: [5]
+			},
+			key6: {}
+		});
+	});
+});
+
 describe("copy", () => {
 	test("primitive", () => {
 		expect(Object.copy(true)).toBe(true);

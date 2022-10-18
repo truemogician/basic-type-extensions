@@ -8,6 +8,18 @@ export enum CleanOption {
 	All = (1 << 4) - 1
 }
 
+export interface RightAssignOptions {
+	/**
+	 * If `true`, right assignment will also be applied to object properties nestedly.
+	 */
+	nested?: boolean;
+
+	/**
+	 * If `true`, getters of `source` will also be included.
+	 */
+	getter?: boolean;
+}
+
 type StringKeyObject<TValue = any> = { [K: string]: TValue; }
 
 declare global {
@@ -63,6 +75,13 @@ declare global {
 		 * @param sources Array of source objects
 		 */
 		innerAssign<T extends object>(target: T, ...sources: (PartialDeep<T> & StringKeyObject)[]): T;
+
+		/**
+		 * Assign all values from `source` to `target`
+		 * @param target Target object
+		 * @param source Source object
+		 */
+		rightAssign<T extends object, R extends object>(target: T, source: R, options?: RightAssignOptions): T & R;
 
 		/**
 		 * Assign values of the common properties of `target` and `sources` from `sources` to `target`, getters in `sources` also included.
@@ -214,6 +233,29 @@ Object.innerAssignWithSetter = function <T extends object>(target: T, ...sources
 
 Object.innerAssignWithAccessor = function <T extends object>(target: T, ...sources: any[]): T {
 	return innerAssign(target, { getter: true, setter: true }, sources);
+}
+
+Object.rightAssign = function <T extends object, R extends object>(target: T, source: R, options?: RightAssignOptions): T & R {
+	const srcKeys = Object.getOwnPropertyNames(source).filter(name => {
+		const descriptor = Object.getOwnPropertyDescriptor(source, name);
+		return descriptor.get ? options?.getter : !descriptor.set;
+	});
+	if (options?.getter) {
+		const accessors = getAccessorDescriptors(source, { getter: true })
+		srcKeys.push(...Object.keys(accessors));
+	}
+	for (const key of srcKeys) {
+		const value = source[key];
+		if (options?.nested) {
+			const dst = (target as any)[key];
+			if (typeof dst == "object" && typeof value == "object") {
+				Object.rightAssign(dst, value, options);
+				continue;
+			}
+		}
+		(target as any)[key] = source[key];
+	}
+	return target as T & R;
 }
 
 Object.copy = function <T = any>(src: T): T {
