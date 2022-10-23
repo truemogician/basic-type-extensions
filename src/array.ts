@@ -139,24 +139,10 @@ declare global {
 		sum(predicate?: (value: T) => number): number;
 
 		/**
-		 * Calculate the summary of the array
-		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited
-		 * @param options Asynchronous operation options
-		 */
-		sumAsync(predicate: (value: T) => Promise<number>, options?: AsyncOptions): Promise<number>;
-
-		/**
 		 * Calculate the product of the array
 		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
 		 */
 		product(predicate?: (value: T) => number): number;
-
-		/**
-		 * Calculate the product of the array.
-		 * @param predicate An asynchronous function that map each element from `T` to `number`. Default conversion function will be used when ommited.
-		 * @param options Asynchronous operation options.
-		 */
-		productAsync(predicate: (value: T) => Promise<number>, options?: AsyncOptions): Promise<number>;
 
 		/**
 		 * Get the minimum item in array
@@ -525,14 +511,6 @@ Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => num
 	return result;
 }
 
-Array.prototype.sumAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>, options?: AsyncOptions): Promise<number> {
-	let result = 0;
-	await this.forEachAsync(async value => {
-		result += await predicate(value);
-	}, null, options);
-	return result;
-}
-
 Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
 	let result = 1;
 	if (!predicate)
@@ -545,14 +523,6 @@ Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) =>
 			}
 		}
 	this.forEach(value => result *= predicate!(value));
-	return result;
-}
-
-Array.prototype.productAsync = async function <T>(this: Array<T>, predicate: (value: T) => Promise<number>, options?: AsyncOptions): Promise<number> {
-	let result = 1;
-	await this.forEachAsync(async value => {
-		result *= await predicate(value);
-	}, null, options);
 	return result;
 }
 

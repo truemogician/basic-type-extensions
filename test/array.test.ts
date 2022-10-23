@@ -164,18 +164,7 @@ describe("Array<T>", () => {
 
 		test("other", () => expect(() => { [[0], { key: "value" }].sum() }).toThrow());
 
-		test("map", () => expect(arrays[2].sum(num => num == 1 ? 1 : 0)).toBe(3));
-
-		test("async", () => {
-			const duration = 500;
-			const start = Date.now();
-			arrays[0].sumAsync(num => new Promise(resolve =>
-				setTimeout(() => resolve(num), duration)
-			)).then(result => {
-				expect(result).toBe(10);
-				expect(Math.abs(Date.now() - start - duration)).toBeLessThan(25);
-			})
-		});
+		test("map", () => { expect(arrays[2].sum(num => num == 1 ? 1 : 0)).toBe(3) });
 	});
 
 	describe("product", () => {
@@ -184,17 +173,6 @@ describe("Array<T>", () => {
 		test("other", () => expect(() => { [[0], { key: "value" }].product() }).toThrow());
 
 		test("map", () => expect(arrays[2].product(num => num == 1 ? 2 : 1)).toBe(8));
-
-		test("async", async () => {
-			const duration = 500;
-			const start = Date.now();
-			await arrays[0].slice(1).productAsync(num => new Promise(resolve =>
-				setTimeout(() => resolve(num), duration)
-			)).then(result => {
-				expect(result).toBe(24);
-				expect(Math.abs(Date.now() - start - duration)).toBeLessThan(25);
-			})
-		});
 	});
 
 	describe("minimum & maximum", () => {
