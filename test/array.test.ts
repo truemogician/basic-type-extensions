@@ -208,12 +208,12 @@ describe("Array<T>", () => {
 		expect(groups.get(3)).toEqual([[3, 6], [3, 0]]);
 	});
 
-	describe("keySort", () => {
-		test("default", () => expect([1, 11, false, 2, 8, 3].keySort()).toEqual([false, 1, 2, 3, 8, 11]));
+	describe("sortByKey", () => {
+		test("default", () => expect([1, 11, false, 2, 8, 3].sortByKey()).toEqual([false, 1, 2, 3, 8, 11]));
 
 		test("keys", () => {
 			const arr = [1, 1, 3, 4, 6, 8];
-			expect(arr.keySort(num => num & 1, num => num)).toEqual([4, 6, 8, 1, 1, 3])
+			expect(arr.sortByKey(num => num & 1, num => num)).toEqual([4, 6, 8, 1, 1, 3])
 		});
 	});
 

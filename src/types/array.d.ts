@@ -337,7 +337,7 @@ declare global {
 		 * Sort the array in place by keys provided by a series of key selector functions
 		 * @param keys Array of key selector functions
 		 */
-		keySort(...keys: ((obj: T) => any)[]): T[];
+		sortByKey(...keys: ((obj: T) => any)[]): T[];
 
 		/**
 		 * Shuffle the array randomly in place

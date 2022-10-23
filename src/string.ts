@@ -23,7 +23,7 @@ String.prototype.splitAt = function (this: string, indices: number | number[], c
 	if (typeof indices == "number")
 		indices = [indices];
 	if (!indices.isAscending())
-		indices.keySort();
+		indices.sortByKey();
 	let start = 0, end = 1;
 	for (let negative = indices[0] < 0; end < indices.length; negative = indices[end++] < 0) {
 		if (negative)
