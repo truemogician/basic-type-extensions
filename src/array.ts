@@ -401,6 +401,12 @@ Array.prototype.binarySearch = function <T>(this: Array<T>, value: T, param2?: C
 	return left;
 }
 
+Array.prototype.binarySearchByKey = function <T>(this: Array<T>, value: T, param1?: Selector<T> | "upper" | "lower", ...param2: Selector<T>[]): number {
+	const bound = typeof param1 == "string" ? param1 : "lower";
+	const selectors = typeof param1 == "function" ? [param1, ...param2] : param2;
+	return this.binarySearch(value, bound, keyOrderComparer(...selectors));
+}
+
 Array.prototype.ternarySearch = function <T>(this: Array<T>, param1?: Comparer<T> | "upper" | "lower", param2?: Comparer<T>): number {
 	if (this.length <= 1)
 		return this.length - 1;
@@ -435,4 +441,10 @@ Array.prototype.ternarySearch = function <T>(this: Array<T>, param1?: Comparer<T
 				left = mid1 + 1;
 		}
 	}
+}
+
+Array.prototype.ternarySearchByKey = function <T>(this: Array<T>, param1?: Selector<T> | "upper" | "lower", ...param2: Selector<T>[]): number {
+	const bound = typeof param1 == "string" ? param1 : "lower";
+	const selectors = typeof param1 == "function" ? [param1, ...param2] : param2;
+	return this.ternarySearch(bound, keyOrderComparer(...selectors));
 }

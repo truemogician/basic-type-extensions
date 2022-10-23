@@ -256,7 +256,46 @@ declare global {
 		 * 
 		 * If the array is empty, `-1` will be returned.
 		 */
-		binarySearch(value: T, bound?: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
+		binarySearch(value: T, bound: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
+
+		/**
+		 * Searches for the index of a specific value in an **ordered** array.
+		 * @param value The value to search for in the array.
+		 * @param selectors A series of key selector functions.
+		 * @return 
+		 * - #### Ascending array  
+		 *  The index of the first largest element that is less than or equal to `value`.  
+		 *  If `value` is less than the first element, `0` will be returned.  
+		 *  If `value` is greater than the last element, the length of the array will be returned.
+		 * - #### Descending array
+		 * 	The index of the first smallest element that is greater than or equal to `value`.  
+		 * 	If `value` is greater than the first element, `0` will be returned.  
+		 * 	If `value` is less than the last element, the length of the array will be returned.
+		 * 
+		 * If the array is empty, `0` will be returned.
+		 */
+		binarySearchByKey(value: T, ...selectors: ((value: T) => any)[]): number;
+
+		/**
+		 * Search for the index of a specific value in an **ordered** array.
+		 * @param value The value to search for in the array.
+		 * @param bound Default is "lower".
+		 * @param selectors A series of key selector functions.
+		 * @return 
+		 * - #### Ascending array
+		 *  The index of the first largest element that is less than or equal to `value` if `bound` is `"lower"`.  
+		 *  Or the index of the smallest element that is greater than `value` if `bound` is `"upper"`.  
+		 *  If `value` is less than the first element, `0` will be returned.  
+		 *  If `value` is greater than the last element, the length of the array will be returned.
+		 * - #### Descending array
+		 * 	The index of the first smallest element that is greater than or equal to `value` if `bound` is `"lower"`.  
+		 *  Or the index of the largest element that is less than `value` if `bound` is `"upper"`.  
+		 * 	If `value` is greater than the first element, `0` will be returned.  
+		 * 	If `value` is less than the last element, the length of the array will be returned.
+		 * 
+		 * If the array is empty, `-1` will be returned.
+		 */
+		binarySearchByKey(value: T, bound: "lower" | "upper", ...selectors: ((value: T) => any)[]): number;
 
 		/**
 		 * Searches for the extremum in a **unimodal** array.
@@ -284,7 +323,25 @@ declare global {
 		 * or the index of the last extremum if `bound` is `"upper"`.  
 		 * If the array is empty, `-1` will be returned.
 		 */
-		ternarySearch(bound?: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
+		ternarySearch(bound: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
+
+		/**
+		 * Searches for the extremum in a **unimodal** array.
+		 * @param selectors A series of key selector functions.
+		 * @return The index of the first extremum.  
+		 * If the array is empty, `-1` will be returned.
+		 */
+		ternarySearchByKey(...selectors: ((value: T) => any)[]): number;
+
+		/**
+		 * Searches for the extremum in a **unimodal** array.
+		 * @param bound Default is "lower".
+		 * @param selectors A series of key selector functions.
+		 * @return The index of the first extremum if `bound` is `"lower"`,  
+		 * or the index of the last extremum if `bound` is `"upper"`.  
+		 * If the array is empty, `-1` will be returned.
+		 */
+		ternarySearchByKey(bound: "lower" | "upper", ...selectors: ((value: T) => any)[]): number;
 	}
 
 	interface Array<T> extends ReadonlyArray<T> {
