@@ -1,10 +1,5 @@
-export enum CleanOption {
-	Undefined = 1 << 0,
-	Null = 1 << 1,
-	EmptyObject = 1 << 2,
-	EmptyString = 1 << 3,
-	All = (1 << 4) - 1
-}
+import type { PartialDeep } from "type-fest";
+import type { CleanOption } from "../object";
 
 export interface RightAssignOptions {
 	/**
@@ -115,12 +110,18 @@ declare global {
 		clone<T>(src: T): T;
 
 		/**
+		 * Cleans `null` and `undefined` properties of an object.
+		 * @param src Object to clean.
+		 */
+		clean<T extends object>(src: T): PartialDeep<T>;
+
+		/**
 		 * Cleans empty properties of an object.
 		 * @param src Object to clean.
-		 * @param options Options to determine the kinds of properties to remove, default is `null` and `undefined`.
+		 * @param options Options to determine the kinds of properties to remove.
 		 * @param recursive If `true`, nested objects will also be cleaned. Default is `true`.
 		 */
-		clean<T extends object>(src: T, options?: CleanOption, recursive?: boolean): PartialDeep<T>;
+		clean<T extends object>(src: T, options: CleanOption, recursive?: boolean): PartialDeep<T>;
 
 		/**
 		 * Cleans an object.

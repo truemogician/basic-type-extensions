@@ -1,6 +1,8 @@
+import "./array";
 import "./math";
 import "./promise";
 import "./string";
 
-export * from "./array";
-export * from "./object";
+export { CleanOption } from "./object";
+export type { AsyncOptions } from "./types/array";
+export type { RightAssignOptions } from "./types/object";

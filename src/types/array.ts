@@ -289,11 +289,17 @@ declare global {
 
 	interface Array<T> extends ReadonlyArray<T> {
 		/**
-		 * Inserts a value into an ascending array using binary search.
+		 * Inserts a value into an **ordered** array using binary search.
 		 * @param value Value to insert.
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
 		 * @returns The index where `value` is inserted.
 		 */
-		insert(value: T): number;
+		insert(value: T, compareFn?: (a: T, b: T) => number): number;
 
 		/**
 		 * Inserts a value into specific position into an array.
