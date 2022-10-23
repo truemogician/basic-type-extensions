@@ -241,13 +241,7 @@ declare global {
 		ternarySearch(bound?: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
 	}
 
-	interface Array<T> {
-		/**
-		 * Index the array backward
-		 * @param index Backward index. Default is 0
-		 */
-		last(index?: number): T;
-
+	interface Array<T> extends ReadonlyArray<T> {
 		/**
 		 * Insert a value into an ascending array using binary search
 		 * @param value Value to be inserted
@@ -292,48 +286,6 @@ declare global {
 		removeAt(...indices: number[]): boolean;
 
 		/**
-		 * Calculate the summary of the array
-		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
-		 */
-		sum(predicate?: (value: T) => number): number;
-
-		/**
-		 * Calculate the product of the array
-		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
-		 */
-		product(predicate?: (value: T) => number): number;
-
-		/**
-		 * Get the minimum item in array
-		 * @param compareFn Compare function
-		 */
-		minimum(compareFn?: (a: T, b: T) => number): T;
-
-		/**
-		 * Get the minimum item in array using key comparison
-		 * @param keys Array of key-generation functions
-		 */
-		minimum(...keys: ((obj: T) => any)[]): T;
-
-		/**
-		 * Get the maximum item in array
-		 * @param compareFn Compare function
-		 */
-		maximum(compareFn?: (a: T, b: T) => number): T;
-
-		/**
-		 * Get the maximum item in array using key comparison
-		 * @param keys Array of key-generation functions
-		 */
-		maximum(...keys: ((obj: T) => any)[]): T;
-
-		/**
-		 * Group an array by its key
-		 * @param key Map key selector
-		 */
-		groupBy<U>(key: (obj: T) => U): Map<U, T[]>;
-
-		/**
 		 * Sort the array in place by keys provided by a series of key selector functions
 		 * @param keys Array of key selector functions
 		 */
@@ -344,114 +296,5 @@ declare global {
 		 * @return A reference to the array
 		 */
 		shuffle(): T[];
-
-		/**
-		 * Repeat the array `count` times
-		 * @param count Default is 1, which means no repeat
-		 */
-		repeat(count?: number): T[];
-
-		/**
-		 * Check whether the array has common elements with another array
-		 * @param array Another array
-		 */
-		intersects(array: Array<T>): boolean;
-
-		/**
-		 * Check whether the array is ascending
-		 * @param predicate Compare function
-		 */
-		isAscending(predicate?: (a: T, b: T) => number): boolean;
-
-		/**
-		 * Check whether the array is ascending using key comparison
-		 * @param keys Array of key-generation functions
-		 */
-		isAscending(...keys: ((obj: T) => any)[]): boolean;
-
-		/**
-		 * Check whether the array is descending
-		 * @param predicate Compare function
-		 */
-		isDescending(predicate?: (a: T, b: T) => number): boolean;
-
-		/**
-		 * Check whether the array is descending using key comparison
-		 * @param keys Array of key-generation functions
-		 */
-		isDescending(...keys: ((obj: T) => any)[]): boolean;
-
-		/**
-		 * Performs the specified asynchronous action for each element in an array
-		 * @param callbackfn  An asynchronous function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array
-		 * @param thisArg  An object to which the this keyword can refer in the callbackfn function. If `thisArg` is omitted, undefined is used as the this value
-		 * @param options Asynchronous operation options
-		 */
-		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any, options?: AsyncOptions): Promise<void>
-
-		/**
-		 * Calls a defined asynchronous callback function on each element of an array, and returns an array that contains the results
-		 * @param callbackfn An asynchronous function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array
-		 * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value
-		 * @param options Asynchronous operation options
-		 */
-		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]>
-
-		/**
-		 * Search for the index of a specific value in an **ordered** array
-		 * @param value The value to search for in the array
-		 * @param compareFn Compare function
-		 * @return 
-		 * - #### Ascending array  
-		 *  The index of the first largest element that is less than or equal to `value`.  
-		 *  If `value` is less than the first element, `0` will be returned.  
-		 *  If `value` is greater than the last element, the length of the array will be returned.
-		 * - #### Descending array
-		 * 	The index of the first smallest element that is greater than or equal to `value`.  
-		 * 	If `value` is greater than the first element, `0` will be returned.  
-		 * 	If `value` is less than the last element, the length of the array will be returned.
-		 * 
-		 * If the array is empty, `-1` will be returned.
-		 */
-		binarySearch(value: T, compareFn?: (a: T, b: T) => number): number;
-
-		/**
-		 * Search for the index of a specific value in an **ordered** array
-		 * @param value The value to search for in the array
-		 * @param compareFn Compare function
-		 * @param bound Default is "lower"
-		 * @return 
-		 * - #### Ascending array
-		 *  The index of the first largest element that is less than or equal to `value` if `bound` is `"lower"`.  
-		 *  Or the index of the smallest element that is greater than `value` if `bound` is `"upper"`.  
-		 *  If `value` is less than the first element, `0` will be returned.  
-		 *  If `value` is greater than the last element, the length of the array will be returned.
-		 * - #### Descending array
-		 * 	The index of the first smallest element that is greater than or equal to `value` if `bound` is `"lower"`.  
-		 *  Or the index of the largest element that is less than `value` if `bound` is `"upper"`.  
-		 * 	If `value` is greater than the first element, `0` will be returned.  
-		 * 	If `value` is less than the last element, the length of the array will be returned.
-		 * 
-		 * If the array is empty, `-1` will be returned.
-		 */
-		binarySearch(value: T, bound?: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
-
-		/**
-		 * Searches for the extremum in a **unimodal** array
-		 * @param compareFn Compare function
-		 * @return The index of the first extremum.  
-		 * If the array is empty, `-1` will be returned.
-		 */
-		ternarySearch(compareFn?: (a: T, b: T) => number): number;
-
-		/**
-		 * Searches for the extremum in a **unimodal** array
-		 * @param compareFn Compare function
-		 * @param bound Default is "lower"
-		 * @return The index of the first extremum if `bound` is `"lower"`,  
-		 * or the index of the last extremum if `bound` is `"upper"`.  
-		 * If the array is empty, `-1` will be returned.
-		 */
-		ternarySearch(bound?: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
 	}
 }
