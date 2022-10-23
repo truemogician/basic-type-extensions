@@ -323,4 +323,60 @@ describe("Array<T>", () => {
 			expect(actual).toEqual([0, 2, 4, 6, 8]);
 		});
 	});
+
+	describe("binarySearch", () => {
+		const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+		const arr2 = [0, 1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5];
+		const arr3 = [6, 5, 5, 4, 2, 2, 2, 1, 0];
+		test("normal", () => {
+			expect(arr.binarySearch(5)).toBe(5);
+			expect(arr2.binarySearch(3)).toBe(5);
+		});
+
+		test("bound", () => {
+			expect(arr2.binarySearch(2, "lower")).toBe(2);
+			expect(arr2.binarySearch(2, "upper")).toBe(5);
+			expect(arr2.binarySearch(6, "upper")).toBe(12);
+		});
+
+		test("endpoint", () => {
+			expect(arr.binarySearch(-1, "lower")).toBe(0);
+			expect(arr.binarySearch(-1, "upper")).toBe(0);
+			expect(arr.binarySearch(10, "lower")).toBe(10);
+			expect(arr.binarySearch(10, "upper")).toBe(10);
+		});
+
+		test("descending", () => {
+			expect(arr3.binarySearch(2, "lower")).toBe(4);
+			expect(arr3.binarySearch(2, "upper")).toBe(7);
+		});
+
+		test("empty array", () => {
+			expect(new Array<number>().binarySearch(0)).toBe(-1);
+		});
+	});
+
+	describe("ternarySearch", () => {
+		const arr = [0, 1, 2, 3, 4, 3, 2, 1, 0];
+		const arr2 = [0, 2, 2, 3, 5, 5, 5, 2, 1];
+		const arr3 = [5, 4, 3, 1, 1, 1, 2, 6];
+		test("normal", () => {
+			expect(arr.ternarySearch()).toBe(4);
+			expect(arr2.ternarySearch()).toBe(4);
+		});
+
+		test("bound", () => {
+			expect(arr2.ternarySearch("lower")).toBe(4);
+			expect(arr2.ternarySearch("upper")).toBe(6);
+		});
+
+		test("minimum", () => {
+			expect(arr3.ternarySearch("lower")).toBe(3);
+			expect(arr3.ternarySearch("upper")).toBe(5);
+		});
+
+		test("empty array", () => {
+			expect(new Array<number>().ternarySearch()).toBe(-1);
+		});
+	});
 });

@@ -250,6 +250,63 @@ declare global {
 		 * @param options Asynchronous operation options
 		 */
 		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]>
+
+		/**
+		 * Search for the index of a specific value in an **ordered** array
+		 * @param value The value to search for in the array
+		 * @param compareFn Compare function
+		 * @return 
+		 * - #### Ascending array  
+		 *  The index of the first largest element that is less than or equal to `value`.  
+		 *  If `value` is less than the first element, `0` will be returned.  
+		 *  If `value` is greater than the last element, the length of the array will be returned.
+		 * - #### Descending array
+		 * 	The index of the first smallest element that is greater than or equal to `value`.  
+		 * 	If `value` is greater than the first element, `0` will be returned.  
+		 * 	If `value` is less than the last element, the length of the array will be returned.
+		 * 
+		 * If the array is empty, `-1` will be returned.
+		 */
+		binarySearch(value: T, compareFn?: (a: T, b: T) => number): number;
+
+		/**
+		 * Search for the index of a specific value in an **ordered** array
+		 * @param value The value to search for in the array
+		 * @param compareFn Compare function
+		 * @param bound Default is "lower"
+		 * @return 
+		 * - #### Ascending array
+		 *  The index of the first largest element that is less than or equal to `value` if `bound` is `"lower"`.  
+		 *  Or the index of the smallest element that is greater than `value` if `bound` is `"upper"`.  
+		 *  If `value` is less than the first element, `0` will be returned.  
+		 *  If `value` is greater than the last element, the length of the array will be returned.
+		 * - #### Descending array
+		 * 	The index of the first smallest element that is greater than or equal to `value` if `bound` is `"lower"`.  
+		 *  Or the index of the largest element that is less than `value` if `bound` is `"upper"`.  
+		 * 	If `value` is greater than the first element, `0` will be returned.  
+		 * 	If `value` is less than the last element, the length of the array will be returned.
+		 * 
+		 * If the array is empty, `-1` will be returned.
+		 */
+		binarySearch(value: T, bound?: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
+
+		/**
+		 * Searches for the extremum in a **unimodal** array
+		 * @param compareFn Compare function
+		 * @return The index of the first extremum.  
+		 * If the array is empty, `-1` will be returned.
+		 */
+		ternarySearch(compareFn?: (a: T, b: T) => number): number;
+
+		/**
+		 * Searches for the extremum in a **unimodal** array
+		 * @param compareFn Compare function
+		 * @param bound Default is "lower"
+		 * @return The index of the first extremum if `bound` is `"lower"`,  
+		 * or the index of the last extremum if `bound` is `"upper"`.  
+		 * If the array is empty, `-1` will be returned.
+		 */
+		ternarySearch(bound?: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
 	}
 }
 
@@ -649,4 +706,66 @@ Array.prototype.mapAsync = async function <T, TResult>(this: Array<T>, callbackf
 		results[index] = result;
 	}, thisArg, options);
 	return results;
+}
+
+Array.prototype.binarySearch = function <T>(this: Array<T>, value: T, param2?: Comparer<T> | "upper" | "lower", param3?: Comparer<T>): number {
+	if (this.length == 0)
+		return -1;
+	const bound = typeof param2 == "string" ? param2 : "lower";
+	const compare: Comparer<T> = typeof param2 == "function" ? param2 : param3 || defaultComparer;
+	const desc = compare(this[0], this[this.length - 1]) > 0;
+	let left = 0, right = this.length - 1;
+	while (left <= right) {
+		const mid = (left + right) >> 1;
+		let cmp = compare(this[mid], value);
+		if (desc)
+			cmp = -cmp;
+		if (cmp < 0)
+			left = mid + 1;
+		else if (cmp > 0)
+			right = mid - 1;
+		else {
+			if (bound == "lower")
+				right = mid - 1;
+			else
+				left = mid + 1;
+		}
+	}
+	return left;
+}
+
+Array.prototype.ternarySearch = function <T>(this: Array<T>, param1?: Comparer<T> | "upper" | "lower", param2?: Comparer<T>): number {
+	if (this.length <= 1)
+		return this.length - 1;
+	const bound = typeof param1 == "string" ? param1 : "lower";
+	const compare: Comparer<T> = typeof param1 == "function" ? param1 : param2 || defaultComparer;
+	const mid = (this.length - 1) >> 1;
+	const min = compare(this[0], this[mid]) > 0 || compare(this.last(), this[mid]) > 0;
+	let left = 0, right = this.length - 1;
+	while (true) {
+		if (right == left)
+			return right;
+		if (right - left == 1) {
+			let cmp = compare(this[left], this[right]);
+			if (min)
+				cmp = -cmp;
+			return cmp > 0 ? left : cmp < 0 ? right : bound == "lower" ? left : right;
+		}
+		const third = (right - left) / 3;
+		const mid1 = Math.floor(left + third);
+		const mid2 = Math.ceil(right - third);
+		let cmp = compare(this[mid1], this[mid2]);
+		if (min)
+			cmp = -cmp;
+		if (cmp > 0)
+			right = mid2 - 1;
+		else if (cmp < 0)
+			left = mid1 + 1;
+		else {
+			if (bound == "lower")
+				right = mid2 - 1;
+			else
+				left = mid1 + 1;
+		}
+	}
 }
