@@ -1,6 +1,6 @@
 import "../src";
 
-const arrays = [
+const arrays: readonly (readonly number[])[] = [
 	[0, 1, 2, 3, 4],
 	[1, 1, 3, 4, 6, 8],
 	[0, 0, 1, 1, 1, 3, 9],
@@ -8,9 +8,8 @@ const arrays = [
 ];
 
 describe("ArrayConstructor", () => {
-	let arr0 = new Array<number>(), arr1 = new Array<number>();
-	Object.assign(arr0, arrays[0]).shuffle();
-	Object.assign(arr1, arrays[1]).shuffle();
+	const arr0 = [0, 1, 2, 3, 4].shuffle();
+	const arr1 = [1, 1, 3, 4, 6, 8].shuffle();
 
 	describe("intersection", () => {
 		test("two", () => expect(Array.intersection(arr0, arr1)).toEqual([1, 3, 4]));
@@ -85,13 +84,13 @@ describe("Array<T>", () => {
 
 	describe("insert", () => {
 		test("normal", () => {
-			const arr = Object.clone(arrays[0]);
+			const arr = [0, 1, 2, 3, 4];
 			expect(arr.insert(3)).toBe(3);
 			expect(arr).toStrictEqual([0, 1, 2, 3, 3, 4]);
 		});
 
 		test("border", () => {
-			const arr = Object.clone(arrays[0]);
+			const arr = [0, 1, 2, 3, 4];
 			expect(arr.insert(10)).toBe(5);
 			expect(arr).toStrictEqual([0, 1, 2, 3, 4, 10]);
 			expect(arr.insert(-1)).toBe(0);
@@ -107,13 +106,13 @@ describe("Array<T>", () => {
 
 	describe("insertAt", () => {
 		test("normal", () => {
-			const arr = Object.clone(arrays[0]);
+			const arr = [0, 1, 2, 3, 4];
 			expect(arr.insertAt(-1, 3)).toBe(true);
 			expect(arr).toStrictEqual([0, 1, 2, -1, 3, 4]);
 		});
 
 		test("out of range", () => {
-			const arr = Object.clone(arrays[0]);
+			const arr = [0, 1, 2, 3, 4];
 			expect(arr.insertAt(-1, 10)).toBe(false);
 			expect(arr).toStrictEqual(arrays[0]);
 		});
@@ -121,19 +120,19 @@ describe("Array<T>", () => {
 
 	describe("remove", () => {
 		test("single", () => {
-			const arr = Object.clone(arrays[2]);
+			const arr = [0, 0, 1, 1, 1, 3, 9];
 			expect(arr.remove(1)).toBe(3);
 			expect(arr).toStrictEqual([0, 0, 3, 9]);
 		});
 
 		test("multiple", () => {
-			const arr = Object.clone(arrays[2]);
+			const arr = [0, 0, 1, 1, 1, 3, 9];
 			expect(arr.remove(0, 1)).toBe(5);
 			expect(arr).toStrictEqual([3, 9]);
 		});
 
 		test("none", () => {
-			const arr = Object.clone(arrays[2]);
+			const arr = [0, 0, 1, 1, 1, 3, 9];
 			expect(arr.remove(10)).toBe(0);
 			expect(arr).toStrictEqual(arrays[2]);
 		});
@@ -141,19 +140,19 @@ describe("Array<T>", () => {
 
 	describe("removeAt", () => {
 		test("single", () => {
-			const arr = Object.clone(arrays[0]);
+			const arr = [0, 1, 2, 3, 4];
 			expect(arr.removeAt(2)).toBe(true);
 			expect(arr).toStrictEqual([0, 1, 3, 4]);
 		});
 
 		test("multiple", () => {
-			const arr = Object.clone(arrays[0]);
+			const arr = [0, 1, 2, 3, 4];
 			expect(arr.removeAt(0, 2, 3)).toBe(true);
 			expect(arr).toStrictEqual([1, 4]);
 		});
 
 		test("out of range", () => {
-			const arr = Object.clone(arrays[0]);
+			const arr = [0, 1, 2, 3, 4];
 			expect(arr.removeAt(10)).toBe(false);
 			expect(arr).toStrictEqual(arrays[0]);
 		});
@@ -212,15 +211,18 @@ describe("Array<T>", () => {
 	describe("keySort", () => {
 		test("default", () => expect([1, 11, false, 2, 8, 3].keySort()).toEqual([false, 1, 2, 3, 8, 11]));
 
-		test("keys", () => expect(arrays[1].keySort(num => num & 1, num => num)).toEqual([4, 6, 8, 1, 1, 3]));
+		test("keys", () => {
+			const arr = [1, 1, 3, 4, 6, 8];
+			expect(arr.keySort(num => num & 1, num => num)).toEqual([4, 6, 8, 1, 1, 3])
+		});
 	});
 
 	test("shuffle", () => {
-		let temp = Object.clone(arrays[0]);
-		temp.shuffle();
-		expect(temp.length).toBe(arrays[0].length);
-		expect(temp).not.toEqual(arrays[0]);
-		temp.forEach(num => expect(arrays[0].includes(num)).toBeTruthy());
+		const arr = [0, 1, 2, 3, 4];
+		arr.shuffle();
+		expect(arr.length).toBe(arrays[0].length);
+		expect(arr).not.toEqual(arrays[0]);
+		arr.forEach(num => expect(arrays[0].includes(num)).toBeTruthy());
 	});
 
 	describe("repeat", () => {
@@ -252,22 +254,24 @@ describe("Array<T>", () => {
 
 	describe("isAscending & isDescending", () => {
 		test("normal", () => {
-			expect(arrays[0].isAscending()).toBeTruthy();
-			expect(arrays[0].reverse().isDescending()).toBeTruthy();
-			expect([1, 9, 2, 6].isAscending()).toBeFalsy();
-			expect([1, 9, 2, 6].isDescending()).toBeFalsy();
+			const arr = [0, 1, 2, 3, 4];
+			const arr2 = [1, 9, 2, 6];
+			expect(arr.isAscending()).toBeTruthy();
+			expect(arr.reverse().isDescending()).toBeTruthy();
+			expect(arr2.isAscending()).toBeFalsy();
+			expect(arr2.isDescending()).toBeFalsy();
 		});
 
 		test("constant", () => {
-			const array = [1, 1, 1, 1, 1, 1];
-			expect(array.isAscending()).toBeTruthy();
-			expect(array.isDescending()).toBeTruthy();
+			const arr = [1, 1, 1, 1];
+			expect(arr.isAscending()).toBeTruthy();
+			expect(arr.isDescending()).toBeTruthy();
 		});
 
 		test("keys", () => {
-			const array = [0, 2, 4, 1, 7, 9];
-			expect(array.isAscending(num => num & 1, num => num)).toBeTruthy();
-			expect(array.isDescending(num => 1 - (num & 1), num => -num)).toBeTruthy();
+			const arr = [0, 2, 4, 1, 7, 9];
+			expect(arr.isAscending(num => num & 1, num => num)).toBeTruthy();
+			expect(arr.isDescending(num => 1 - (num & 1), num => -num)).toBeTruthy();
 		})
 	});
 
