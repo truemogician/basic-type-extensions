@@ -14,9 +14,9 @@ String.prototype.remove = function (this: string, from: number, length?: number)
 	if (length && length <= 0)
 		return this;
 	else if (length && from + length < this.length)
-		return this.substr(0, from) + this.substr(from + length)
+		return this.substring(0, from) + this.substring(from + length)
 	else
-		return this.substr(0, from);
+		return this.substring(0, from);
 }
 
 String.prototype.splitAt = function (this: string, indices: number | number[], charAtIndex: "pred" | "succ" | "both" | "none" = "succ"): string[] {
@@ -37,7 +37,7 @@ String.prototype.splitAt = function (this: string, indices: number | number[], c
 	const result = new Array<string>();
 	const pred = (charAtIndex == "pred" || charAtIndex == "both") ? 1 : 0;
 	const succ = (charAtIndex == "succ" || charAtIndex == "both") ? 1 : 0;
-	let sub = this.substr(0, indices[0] + pred);
+	let sub = this.substring(0, indices[0] + pred);
 	if (sub != "")
 		result.push(sub);
 	for (let i = 1; i < indices.length; ++i) {
@@ -47,7 +47,7 @@ String.prototype.splitAt = function (this: string, indices: number | number[], c
 		if (start < end)
 			result.push(this.substring(start, end));
 	}
-	sub = this.substr(indices.last() + 1 - succ);
+	sub = this.substring(indices.last() + 1 - succ);
 	if (sub != "")
 		result.push(sub);
 	return result;
