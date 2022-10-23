@@ -228,7 +228,7 @@ declare global {
 		 * 	If `value` is greater than the first element, `0` will be returned.  
 		 * 	If `value` is less than the last element, the length of the array will be returned.
 		 * 
-		 * If the array is empty, `-1` will be returned.
+		 * If the array is empty, `0` will be returned.
 		 */
 		binarySearch(value: T, compareFn?: (a: T, b: T) => number): number;
 

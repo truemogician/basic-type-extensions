@@ -334,7 +334,7 @@ describe("Array<T>", () => {
 		});
 
 		test("empty array", () => {
-			expect(new Array<number>().binarySearch(0)).toBe(-1);
+			expect(new Array<number>().binarySearch(0)).toBe(0);
 		});
 	});
 

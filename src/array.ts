@@ -154,17 +154,10 @@ Array.prototype.last = function <T>(this: Array<T>, index: number = 0): T {
 	return this[this.length - index - 1];
 }
 
-Array.prototype.insert = function <T>(this: Array<T>, value: T): number {
-	let l = 0, r = this.length - 1, m;
-	while (l <= r) {
-		m = l + (r - l >> 1);
-		if (value <= this[m])
-			r = m - 1;
-		else
-			l = m + 1;
-	}
-	this.splice(l, 0, value);
-	return l;
+Array.prototype.insert = function <T>(this: Array<T>, value: T, compareFn?: Comparer<T>): number {
+	const index = this.binarySearch(value, compareFn);
+	this.splice(index, 0, value);
+	return index;
 }
 
 Array.prototype.insertAt = function <T>(this: Array<T>, value: T, index: number): boolean {
@@ -384,7 +377,7 @@ Array.prototype.mapAsync = async function <T, TResult>(this: Array<T>, callbackf
 
 Array.prototype.binarySearch = function <T>(this: Array<T>, value: T, param2?: Comparer<T> | "upper" | "lower", param3?: Comparer<T>): number {
 	if (this.length == 0)
-		return -1;
+		return 0;
 	const bound = typeof param2 == "string" ? param2 : "lower";
 	const compare: Comparer<T> = typeof param2 == "function" ? param2 : param3 || defaultComparer;
 	const desc = compare(this[0], this[this.length - 1]) > 0;
