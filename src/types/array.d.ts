@@ -3,8 +3,8 @@
  */
 export interface AsyncOptions {
 	/**
-	 * Maximum number of promises to evaluate in parallel
-	 * If undefined or less than 1, all promises will be evaluated in parallel
+	 * Maximum number of promises to evaluate in parallel.  
+	 * If `undefined` or less than `1`, all promises will be evaluated in parallel.
 	 */
 	maxConcurrency?: number;
 }
@@ -12,181 +12,212 @@ export interface AsyncOptions {
 declare global {
 	interface ArrayConstructor {
 		/**
-		 * Calculate the intersection of two arrays
-		 * @param array1 The first array
-		 * @param array2 The second array
-		 * @returns Intersection result. For duplicate values, the minor amount of which will be kept
+		 * Calculates the intersection of two arrays.
+		 * @param array1 The first array.
+		 * @param array2 The second array.
+		 * @returns The intersection array. For repetitious elements, the minor amount of which will be kept.
 		 */
 		intersection<T = any>(array1: readonly T[], array2: readonly T[]): T[];
 
 		/**
-		 * Calculate the intersection of multiple arrays
-		 * @param arrays Arrays
-		 * @returns Intersection result. For duplicate values, the minimum amount of which will be kept
+		 * Calculates the intersection of multiple arrays.
+		 * @returns The intersection array. For repetitious elements, the minimum amount of which will be kept.
 		 */
 		intersection<T = any>(...arrays: (readonly T[])[]): T[];
 
 		/**
-		 * Calculate the union of two arrays
-		 * @param array1 The first array
-		 * @param array2 The second array
-		 * @returns Union result. For duplicate values, the major amount of which will be kept
+		 * Calculates the union of two arrays.
+		 * @param array1 The first array.
+		 * @param array2 The second array.
+		 * @returns The union array. For repetitious elements, the major amount of which will be kept.
 		 */
 		union<T = any>(array1: readonly T[], array2: readonly T[]): T[];
 
 		/**
-		 * Calculate the union of multiple arrays
-		 * @param arrays Arrays
-		 * @returns Union result. For duplicate values, the maximum amount of which will be kept
+		 * Calculates the union of multiple arrays.
+		 * @returns The union array. For repetitious elements, the maximum amount of which will be kept.
 		 */
 		union<T = any>(...arrays: (readonly T[])[]): T[];
 
 		/**
-		 * Calculate the `source` array's complement array to the `universal` array
+		 * Calculates `source`'s complement array to `universal`
 		 */
 		complement<T = any>(source: readonly T[], universal: readonly T[]): T[];
 
 		/**
-		 * Calculate the the source array's difference set to the target array
+		 * Calculates `source`'s difference set to `target`.
 		 */
 		difference<T = any>(source: readonly T[], target: readonly T[]): T[];
 
 		/**
-		 * Create an array of integers from `begin` to `end`
-		 * @param begin Beginning number, included
-		 * @param end Ending number, included
+		 * Creates an array of integers from `begin` to `end`.
+		 * @param begin Beginning number, included in result.
+		 * @param end Ending number, included in result.
 		 */
 		range(begin: number, end: number): number[];
 
 		/**
-		 * Create an array of integers from `begin` to `end`
-		 * @param begin Beginning number, included
-		 * @param end Ending number, included
+		 * Creates an array of integers from `begin` to `end` with `step`.
+		 * @param begin Beginning number, included in result.
+		 * @param end Ending number, included in result.
+		 * @param step Step size.
 		 */
 		range(begin: number, end: number, step: number): number[];
 
 		/**
-		 * Create an array of integers from `begin` to `end` filtered by `predicate`
-		 * @param begin Beginning number, included
-		 * @param end Ending number, included
-		 * @param predicate Determines whether a number will be included
+		 * Creates an array of integers from `begin` to `end` filtered by `predicate`.
+		 * @param begin Beginning number, included in result.
+		 * @param end Ending number, included in result.
+		 * @param predicate Function used to determine whether a number will be included.
 		 */
 		range(begin: number, end: number, predicate: (item: number) => boolean): number[];
 
 		/**
-		 * Create an array of integers from `begin` to `end` filtered by `predicate`
-		 * @param begin Beginning number, included
-		 * @param end Ending number, included
-		 * @param predicate Determines whether a number will be included
+		 * Creates an array of integers from `begin` to `end` with `step` filtered by `predicate`.
+		 * @param begin Beginning number, included in result.
+		 * @param end Ending number, included in result.
+		 * @param step Step size.
+		 * @param predicate Function used to determine whether a number will be included.
 		 */
 		range(begin: number, end: number, step: number, predicate: (item: number) => boolean): number[];
 	}
 
 	interface ReadonlyArray<T> {
 		/**
-		 * Index the array backward
-		 * @param index Backward index. Default is 0
+		 * Gets the last element of the array.
 		 */
-		last(index?: number): T;
+		last(): T;
 
 		/**
-		 * Get the minimum item in array
-		 * @param compareFn Compare function
+		 * Index the array in reverse order.
+		 * @param index Backward index. Default is `0`.
+		 */
+		last(index: number): T;
+
+		/**
+		 * Calculates the minimum value of the array.
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
 		 */
 		minimum(compareFn?: (a: T, b: T) => number): T;
 
 		/**
-		 * Get the minimum item in array using key comparison
-		 * @param keys Array of key-generation functions
+		 * Calculates the minimum value of the array.
+		 * @param selectors A series of key selector functions.
 		 */
-		minimum(...keys: ((obj: T) => any)[]): T;
+		minimum(...selectors: ((obj: T) => any)[]): T;
 
 		/**
-		 * Get the maximum item in array
-		 * @param compareFn Compare function
+		 * Calculates the maximum value of the array.
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
 		 */
 		maximum(compareFn?: (a: T, b: T) => number): T;
 
 		/**
-		 * Get the maximum item in array using key comparison
-		 * @param keys Array of key-generation functions
+		 * Calculates the maximum value of the array.
+		 * @param selectors A series of key selector functions.
 		 */
-		maximum(...keys: ((obj: T) => any)[]): T;
+		maximum(...selectors: ((obj: T) => any)[]): T;
 
 		/**
-		 * Calculate the summary of the array
-		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
+		 * Calculates the summary of the array.
+		 * @param predicate Function used to map each element from `T` to `number`.  
 		 */
 		sum(predicate?: (value: T) => number): number;
 
 		/**
 		 * Calculate the product of the array
-		 * @param predicate A function that map each element from `T` to `number`. Default conversion function will be used when ommited
+		 * @param predicate Function used to map each element from `T` to `number`.  
 		 */
 		product(predicate?: (value: T) => number): number;
 
 		/**
-		 * Group an array by its key
-		 * @param key Map key selector
+		 * Groups an array by its keys.
+		 * @param selector Key selector function.
 		 */
-		groupBy<U>(key: (obj: T) => U): Map<U, T[]>;
+		groupBy<U>(selector: (obj: T) => U): Map<U, T[]>;
 
 		/**
-		 * Repeat the array `count` times
-		 * @param count Default is 1, which means no repeat
+		 * Repeats the array for specified times.
+		 * @param count Times to repeat. Default is `1`.
+		 * @returns A new array formed by the specified number of repetitions of the given array.
 		 */
 		repeat(count?: number): T[];
 
 		/**
-		 * Check whether the array has common elements with another array
-		 * @param array Another array
+		 * Checks whether the array has common elements with another.
+		 * @param array Another array.
 		 */
 		intersects(array: Array<T>): boolean;
 
 		/**
-		 * Check whether the array is ascending
-		 * @param predicate Compare function
+		 * Checks whether the array is in ascending order.
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
 		 */
-		isAscending(predicate?: (a: T, b: T) => number): boolean;
+		isAscending(compareFn?: (a: T, b: T) => number): boolean;
 
 		/**
-		 * Check whether the array is ascending using key comparison
-		 * @param keys Array of key-generation functions
+		 * Checks whether the array is in ascending order.
+		 * @param selectors A series of key selector functions.
 		 */
-		isAscending(...keys: ((obj: T) => any)[]): boolean;
+		isAscending(...selectors: ((obj: T) => any)[]): boolean;
 
 		/**
-		 * Check whether the array is descending
-		 * @param predicate Compare function
+		 * Checks whether the array is in descending order.
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
 		 */
-		isDescending(predicate?: (a: T, b: T) => number): boolean;
+		isDescending(compareFn?: (a: T, b: T) => number): boolean;
 
 		/**
-		 * Check whether the array is descending using key comparison
-		 * @param keys Array of key-generation functions
+		 * Checks whether the array is in descending order.
+		 * @param selectors A series of key selector functions.
 		 */
-		isDescending(...keys: ((obj: T) => any)[]): boolean;
+		isDescending(...selectors: ((obj: T) => any)[]): boolean;
 
 		/**
-		 * Performs the specified asynchronous action for each element in an array
-		 * @param callbackfn  An asynchronous function that accepts up to three arguments. forEach calls the callbackfn function one time for each element in the array
-		 * @param thisArg  An object to which the this keyword can refer in the callbackfn function. If `thisArg` is omitted, undefined is used as the this value
-		 * @param options Asynchronous operation options
+		 * Performs the specified asynchronous action for each element in an array.
+		 * @param callbackfn  An asynchronous function that accepts up to three arguments. `forEachAsync` calls `callbackfn` one time for each element in the array.
+		 * @param thisArg  An object to which the this keyword can refer in `callbackfn`. If `thisArg` is omitted, `undefined` is used as `this`.
+		 * @param options Asynchronous operation options.
 		 */
 		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any, options?: AsyncOptions): Promise<void>
 
 		/**
-		 * Calls a defined asynchronous callback function on each element of an array, and returns an array that contains the results
-		 * @param callbackfn An asynchronous function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array
-		 * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value
-		 * @param options Asynchronous operation options
+		 * Calls a defined asynchronous callback function on each element of an array, and returns an array that contains the results.
+		 * @param callbackfn  An asynchronous function that accepts up to three arguments. `forEachAsync` calls `callbackfn` one time for each element in the array.
+		 * @param thisArg  An object to which the this keyword can refer in `callbackfn`. If `thisArg` is omitted, `undefined` is used as `this`.
+		 * @param options Asynchronous operation options.
 		 */
 		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]>
 
 		/**
-		 * Search for the index of a specific value in an **ordered** array
-		 * @param value The value to search for in the array
-		 * @param compareFn Compare function
+		 * Searches for the index of a specific value in an **ordered** array.
+		 * @param value The value to search for in the array.
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
 		 * @return 
 		 * - #### Ascending array  
 		 *  The index of the first largest element that is less than or equal to `value`.  
@@ -202,10 +233,15 @@ declare global {
 		binarySearch(value: T, compareFn?: (a: T, b: T) => number): number;
 
 		/**
-		 * Search for the index of a specific value in an **ordered** array
-		 * @param value The value to search for in the array
-		 * @param compareFn Compare function
-		 * @param bound Default is "lower"
+		 * Search for the index of a specific value in an **ordered** array。
+		 * @param value The value to search for in the array。
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
+		 * @param bound Default is "lower"。
 		 * @return 
 		 * - #### Ascending array
 		 *  The index of the first largest element that is less than or equal to `value` if `bound` is `"lower"`.  
@@ -223,17 +259,27 @@ declare global {
 		binarySearch(value: T, bound?: "lower" | "upper", compareFn?: (a: T, b: T) => number): number;
 
 		/**
-		 * Searches for the extremum in a **unimodal** array
-		 * @param compareFn Compare function
+		 * Searches for the extremum in a **unimodal** array.
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
 		 * @return The index of the first extremum.  
 		 * If the array is empty, `-1` will be returned.
 		 */
 		ternarySearch(compareFn?: (a: T, b: T) => number): number;
 
 		/**
-		 * Searches for the extremum in a **unimodal** array
-		 * @param compareFn Compare function
-		 * @param bound Default is "lower"
+		 * Searches for the extremum in a **unimodal** array.
+		 * @param compareFn Function used to determine the order of the elements. It is expected to return
+		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
+		 * ```ts
+		 * [11,2,22,1].sort((a, b) => a - b)
+		 * ```
+		 * @param bound Default is "lower".
 		 * @return The index of the first extremum if `bound` is `"lower"`,  
 		 * or the index of the last extremum if `bound` is `"upper"`.  
 		 * If the array is empty, `-1` will be returned.
@@ -243,57 +289,57 @@ declare global {
 
 	interface Array<T> extends ReadonlyArray<T> {
 		/**
-		 * Insert a value into an ascending array using binary search
-		 * @param value Value to be inserted
-		 * @returns The index where `value` is inserted
+		 * Inserts a value into an ascending array using binary search.
+		 * @param value Value to insert.
+		 * @returns The index where `value` is inserted.
 		 */
 		insert(value: T): number;
 
 		/**
-		 * Insert a value into specific position
-		 * @param value Value to be inserted
-		 * @param index Index where `value` will be inserted
-		 * @returns True if `value` is successfully inserted
+		 * Inserts a value into specific position into an array.
+		 * @param value Value to insert.
+		 * @param index Index where `value` will be inserted.
+		 * @returns `true` if `value` is successfully inserted.
 		 */
 		insertAt(value: T, index: number): boolean;
 
 		/**
-		 * Remove all items that equals to `value` from array
-		 * @param value Value to be remoevd
-		 * @returns The number of items removed
+		 * Removes all items that equals to `value` from an array.
+		 * @param value Value to remove.
+		 * @returns The number of items removed.
 		 */
 		remove(value: T): number;
 
 		/**
-		 * Remove all items that equals to any `values` from array
-		 * @param values Values to be remoevd
+		 * Removes all items that equals to any `values` from an array.
+		 * @param values Values to remove.
 		 * @returns The number of items removed
 		 */
 		remove(...values: T[]): number;
 
 		/**
-		 * Remove the item at `index` from array
-		 * @param index Index of item to be removed
-		 * @returns Whether the item is successfully removed
+		 * Removes the item at `index` from an array.
+		 * @param index Index of the item to remove.
+		 * @returns Whether the item is successfully removed.
 		 */
 		removeAt(index: number): boolean;
 
 		/**
-		 * Remove items in `indices` from array
-		 * @param indices Indices of items to be removed
-		 * @returns Whether all items are successfully removed
+		 * Removes items in `indices` from an array.
+		 * @param indices Indices of items remove.
+		 * @returns Whether all items are successfully removed.
 		 */
 		removeAt(...indices: number[]): boolean;
 
 		/**
-		 * Sort the array in place by keys provided by a series of key selector functions
-		 * @param keys Array of key selector functions
+		 * Sorts the array in place by keys provided by a series of key selector functions.
+		 * @param selectors A series of of key selector functions.
 		 */
-		sortByKey(...keys: ((obj: T) => any)[]): T[];
+		sortByKey(...selectors: ((obj: T) => any)[]): T[];
 
 		/**
-		 * Shuffle the array randomly in place
-		 * @return A reference to the array
+		 * Shuffles the array randomly in place.
+		 * @return A reference to the array.
 		 */
 		shuffle(): T[];
 	}
