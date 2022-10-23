@@ -233,15 +233,15 @@ declare global {
 		binarySearch(value: T, compareFn?: (a: T, b: T) => number): number;
 
 		/**
-		 * Search for the index of a specific value in an **ordered** array。
-		 * @param value The value to search for in the array。
+		 * Search for the index of a specific value in an **ordered** array.
+		 * @param value The value to search for in the array.
+		 * @param bound Default is "lower".
 		 * @param compareFn Function used to determine the order of the elements. It is expected to return
 		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
 		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
 		 * ```ts
 		 * [11,2,22,1].sort((a, b) => a - b)
 		 * ```
-		 * @param bound Default is "lower"。
 		 * @return 
 		 * - #### Ascending array
 		 *  The index of the first largest element that is less than or equal to `value` if `bound` is `"lower"`.  
@@ -273,13 +273,13 @@ declare global {
 
 		/**
 		 * Searches for the extremum in a **unimodal** array.
+		 * @param bound Default is "lower".
 		 * @param compareFn Function used to determine the order of the elements. It is expected to return
 		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
 		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
 		 * ```ts
 		 * [11,2,22,1].sort((a, b) => a - b)
 		 * ```
-		 * @param bound Default is "lower".
 		 * @return The index of the first extremum if `bound` is `"lower"`,  
 		 * or the index of the last extremum if `bound` is `"upper"`.  
 		 * If the array is empty, `-1` will be returned.
