@@ -1,18 +1,20 @@
 import type { AsyncOptions } from "./types/array";
 
 type Comparer<T> = (a: T, b: T) => number;
-type Mapper<T, R = any> = (obj: T) => R;
+type Selector<T, R = any> = (obj: T) => R;
 
 const defaultComparer = function <T>(a: T, b: T): number {
 	return a < b ? -1 : a > b ? 1 : 0;
 }
 
-const keyOrderComparer = function <T>(...keys: Mapper<T>[]): Comparer<T> {
+const keyOrderComparer = function <T>(...selectors: Selector<T>[]): Comparer<T> {
 	return (a, b) => {
-		for (const key of keys) {
-			if (key(a) < key(b))
+		for (const selector of selectors) {
+			const keyA = selector(a);
+			const keyB = selector(b);
+			if (keyA < keyB)
 				return -1;
-			else if (key(a) > key(b))
+			else if (keyA > keyB)
 				return 1;
 		}
 		return 0;
@@ -223,12 +225,12 @@ Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) =>
 	return result;
 }
 
-Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]) {
+Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]) {
 	if (!this?.length)
 		return undefined;
 	let compare: Comparer<T> = !func
 		? defaultComparer
-		: func.length == 2 ? func : keyOrderComparer(func as Mapper<T>, ...keys);
+		: func.length == 2 ? func : keyOrderComparer(func as Selector<T>, ...keys);
 	let result = this[0];
 	for (let i = 1; i < this.length; ++i) {
 		if (compare(this[i], result) < 0)
@@ -237,12 +239,12 @@ Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Mapp
 	return result;
 }
 
-Array.prototype.maximum = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]) {
+Array.prototype.maximum = function <T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]) {
 	if (!this?.length)
 		return undefined;
 	let compare: Comparer<T> = !func
 		? defaultComparer
-		: func.length == 2 ? func : keyOrderComparer(func as Mapper<T>, ...keys);
+		: func.length == 2 ? func : keyOrderComparer(func as Selector<T>, ...keys);
 	let result = this[0];
 	for (let i = 1; i < this.length; ++i) {
 		if (compare(this[i], result) > 0)
@@ -264,7 +266,7 @@ Array.prototype.groupBy = function <T, U>(this: Array<T>, key: (obj: T) => U): M
 	return map;
 }
 
-Array.prototype.sortByKey = function <T>(this: Array<T>, ...keys: Mapper<T>[]): T[] {
+Array.prototype.sortByKey = function <T>(this: Array<T>, ...keys: Selector<T>[]): T[] {
 	if (!this || this.length < 2)
 		return this;
 	const compare = keys?.length ? keyOrderComparer(...keys) : defaultComparer;
@@ -314,20 +316,20 @@ Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): bool
 	return false;
 }
 
-Array.prototype.isAscending = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]): boolean {
+Array.prototype.isAscending = function <T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]): boolean {
 	let compare: Comparer<T> = !func
 		? defaultComparer
-		: func.length == 2 ? func : keyOrderComparer(func as Mapper<T>, ...keys);
+		: func.length == 2 ? func : keyOrderComparer(func as Selector<T>, ...keys);
 	for (let i = 1; i < this.length; ++i)
 		if (compare(this[i - 1], this[i]) > 0)
 			return false;
 	return true;
 }
 
-Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> | Mapper<T>, ...keys: Mapper<T>[]): boolean {
+Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]): boolean {
 	let compare: Comparer<T> = !func
 		? defaultComparer
-		: func.length == 2 ? func : keyOrderComparer(func as Mapper<T>, ...keys);
+		: func.length == 2 ? func : keyOrderComparer(func as Selector<T>, ...keys);
 	for (let i = 1; i < this.length; ++i)
 		if (compare(this[i - 1], this[i]) < 0)
 			return false;
