@@ -1,6 +1,6 @@
 {
 	"name": "basic-type-extensions",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"description": "Some useful extensions for Javascript/Typescript basic types",
 	"main": "lib/index.js",
 	"scripts": {

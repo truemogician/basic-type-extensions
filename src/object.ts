@@ -9,12 +9,12 @@ export enum CleanOption {
 	All = (1 << 4) - 1
 }
 
-Object.isEmpty = function (value: {}): boolean {
-	return Object.keys(value).length == 0;
+Object.isEmpty = function (value: any): boolean {
+	return value == null || Object.keys(value).length == 0;
 }
 
 Object.isNullOrUndefined = function (value: any): boolean {
-	return value == null || value == undefined;
+	return value == null;
 }
 
 Object.isNullOrEmpty = function (value: any): boolean {
@@ -58,7 +58,7 @@ Object.getAccessorDescriptors = function <T extends object>(object: T): { [P in 
 
 function innerAssign<T extends object>(target: T, config: Partial<Record<"getter" | "setter", boolean>>, sources: any[]): T {
 	const keys = Object.getOwnPropertyNames(target).filter(name => {
-		const descriptor = Object.getOwnPropertyDescriptor(target, name);
+		const descriptor = Object.getOwnPropertyDescriptor(target, name)!;
 		return descriptor.writable || config.setter && descriptor.set;
 	});
 	if (config.setter) {
@@ -67,7 +67,7 @@ function innerAssign<T extends object>(target: T, config: Partial<Record<"getter
 	}
 	for (const src of sources) {
 		const srcKeys = Object.getOwnPropertyNames(src).filter(name => {
-			const descriptor = Object.getOwnPropertyDescriptor(src, name);
+			const descriptor = Object.getOwnPropertyDescriptor(src, name)!;
 			return descriptor.get ? config.getter : !descriptor.set;
 		});
 		if (config.getter) {
@@ -98,7 +98,7 @@ Object.innerAssignWithAccessor = function <T extends object>(target: T, ...sourc
 
 Object.rightAssign = function <T extends object, R extends object>(target: T, source: R, options?: RightAssignOptions): T & R {
 	const srcKeys = Object.getOwnPropertyNames(source).filter(name => {
-		const descriptor = Object.getOwnPropertyDescriptor(source, name);
+		const descriptor = Object.getOwnPropertyDescriptor(source, name)!;
 		return descriptor.get ? options?.getter : !descriptor.set;
 	});
 	if (options?.getter) {
@@ -120,8 +120,8 @@ Object.rightAssign = function <T extends object, R extends object>(target: T, so
 }
 
 Object.copy = function <T = any>(src: T): T {
-	if (src === null)
-		return null;
+	if (src == null)
+		return (src === undefined ? undefined : null) as T;
 	switch (typeof src) {
 		case "object":
 			let result = src.constructor();

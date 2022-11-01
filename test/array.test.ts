@@ -17,7 +17,7 @@ describe("ArrayConstructor", () => {
 		test("multiple", () => expect(Array.intersection(...arrays.slice(1))).toEqual([1, 1, 3]));
 
 		test("one and empty", () => {
-			expect(Array.intersection()).toBeNull();
+			expect(Array.intersection).toThrow();
 			expect(Array.intersection(arrays[0])).toEqual(arrays[0]);
 		});
 	});
@@ -28,7 +28,7 @@ describe("ArrayConstructor", () => {
 		test("multiple", () => expect(Array.union(...arrays)).toEqual([0, 0, 1, 1, 1, 2, 3, 4, 6, 7, 8, 9]));
 
 		test("one and empty", () => {
-			expect(Array.union()).toBeNull();
+			expect(Array.union).toThrow();
 			expect(Array.union(arrays[0])).toEqual(arrays[0]);
 		});
 	});
@@ -40,12 +40,12 @@ describe("ArrayConstructor", () => {
 
 		test("same", () => expect(Array.complement(arr0, arr0)).toEqual([]));
 
-		test("empty", () => {
-			expect(Array.complement([], arr0)).toEqual(arr0);
-			expect(Array.complement(arr0, [])).toEqual(null);
-		});
+		test("empty", () => expect(Array.complement([], arr0)).toEqual(arr0));
 
-		test("wrong", () => expect(Array.complement([3, 1, 2], [3, 2, 0])).toBe(null));
+		test("error", () => {
+			expect(() => Array.complement(arr0, [])).toThrow();
+			expect(() => Array.complement([3, 1, 2], [3, 2, 0])).toThrow()
+		});
 	});
 
 	describe("difference", () => {
@@ -234,7 +234,7 @@ describe("Array<T>", () => {
 
 		test("zero and negative", () => {
 			expect(arr.repeat(0)).toEqual([]);
-			expect(arr.repeat(-2)).toBeNull();
+			expect(() => arr.repeat(-2)).toThrow();
 		});
 	});
 

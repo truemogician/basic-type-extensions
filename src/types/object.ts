@@ -18,9 +18,10 @@ type StringKeyObject<TValue = any> = { [K: string]: TValue; }
 declare global {
 	interface ObjectConstructor {
 		/**
-		 * Checks whether an object is empty, which means it has no enumerable properties.
+		 * Checks whether `value` is empty, which means it has no enumerable properties. 
+		 * @note If `value` is `null` or `undefined`, it will be considered empty.
 		 */
-		isEmpty(value: {}): boolean;
+		isEmpty(value: any): boolean;
 
 		/**
 		 * Checks whether `value` is `null` or `undefined`.

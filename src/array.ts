@@ -23,7 +23,7 @@ const keyOrderComparer = function <T>(...selectors: Selector<T>[]): Comparer<T> 
 
 Array.intersection = function <T = any>(...arrays: T[][]): T[] {
 	if (arrays.length == 0)
-		return null;
+		throw new Error("No array is provided.");
 	else if (arrays.length == 1)
 		return arrays[0];
 	let tmp1 = new Array<T>();
@@ -57,7 +57,7 @@ Array.intersection = function <T = any>(...arrays: T[][]): T[] {
 
 Array.union = function <T = any>(...arrays: T[][]): T[] {
 	if (arrays.length == 0)
-		return null;
+		throw new Error("No array is provided.");
 	else if (arrays.length == 1)
 		return arrays[0];
 	let tmp1 = new Array<T>();
@@ -90,10 +90,8 @@ Array.union = function <T = any>(...arrays: T[][]): T[] {
 Array.complement = function <T = any>(source: T[], universal: T[]): T[] {
 	if (Object.isNullOrEmpty(source))
 		return Object.copy(universal);
-	if (Object.isNullOrEmpty(universal))
-		return null;
-	if (source.length > universal.length)
-		return null;
+	if (Object.isNullOrEmpty(universal) || source.length > universal.length)
+		throw new Error("The source array is larger than the universal array.");
 	const src = Object.copy(source);
 	const dst = Object.copy(universal);
 	if (!src.isAscending())
@@ -108,7 +106,9 @@ Array.complement = function <T = any>(source: T[], universal: T[]): T[] {
 		else
 			++i;
 	}
-	return i == src.length ? result : null;
+	if (i != src.length)
+		throw new Error("The source array is not a subset of the universal array.");
+	return result;
 }
 
 Array.difference = function <T = any>(source: T[], target: T[]): T[] {
@@ -287,7 +287,7 @@ Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
 
 Array.prototype.repeat = function <T>(this: Array<T>, count: number = 1): T[] {
 	if (count < 0)
-		return null;
+		throw new Error("count must be greater than or equal to 0");
 	const result = new Array<T>(this.length * count);
 	for (let i = 0, j = 0; i < result.length; ++i, ++j) {
 		if (j == this.length)
@@ -339,9 +339,10 @@ Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> |
 Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any, options?: AsyncOptions): Promise<void> {
 	if (this.length == 0)
 		return Promise.resolve();
+	const maxConcurrency = options?.maxConcurrency ?? 0;
 	return new Promise(resolve => {
 		let finished = 0;
-		if (options?.maxConcurrency >= 1 && this.length > options?.maxConcurrency) {
+		if (maxConcurrency >= 1 && this.length > maxConcurrency) {
 			let index = 0;
 			const execute = async () => {
 				const idx = index++;
@@ -354,7 +355,7 @@ Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: 
 				else
 					execute();
 			}
-			for (let i = 0; i < options.maxConcurrency; ++i)
+			for (let i = 0; i < maxConcurrency; ++i)
 				execute();
 		}
 		else {

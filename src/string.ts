@@ -2,11 +2,11 @@ import "./types/string";
 
 String.empty = "";
 
-String.isNullOrEmpty = function (value: string | null): boolean {
+String.isNullOrEmpty = function (value: string | null | undefined): boolean {
 	return value == null || value == "";
 }
 
-String.isNullOrWhiteSpace = function (value: string | null): boolean {
+String.isNullOrWhiteSpace = function (value: string | null | undefined): boolean {
 	return value == null || /^\s*$/.test(value);
 }
 

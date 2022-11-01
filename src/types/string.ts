@@ -10,13 +10,13 @@ declare global {
 		 * Checks whether a string is `null` or empty
 		 * @param value String to check.
 		 */
-		isNullOrEmpty(value: string | null): boolean;
+		isNullOrEmpty(value: string | null | undefined): boolean;
 
 		/**
 		 * Checks whether a string is `null` or whitespace.
 		 * @param value String to check.
 		 */
-		isNullOrWhiteSpace(value: string | null): boolean;
+		isNullOrWhiteSpace(value: string | null | undefined): boolean;
 	}
 
 	interface String {
