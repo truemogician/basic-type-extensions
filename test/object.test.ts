@@ -319,3 +319,11 @@ describe("remove", () => {
 		expect(Object.keys(result)).toEqual(["c"]);
 	});
 });
+
+describe("scope functions", () => {
+	const obj = { a: 1, b: true };
+	test("let", () => expect(obj.let(o => o.a)).toBe(1));
+	test("run", () => expect(obj.run(function () { return this.a; })).toBe(1));
+	test("also", () => expect(obj.also(o => o.a)).toBe(obj));
+	test("apply", () => expect(obj.apply(function () { return this.a; })).toBe(obj));
+});
