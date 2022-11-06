@@ -340,27 +340,39 @@ Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: 
 	if (this.length == 0)
 		return Promise.resolve();
 	const maxConcurrency = options?.maxConcurrency ?? 0;
-	return new Promise(resolve => {
+	return new Promise((resolve, reject) => {
 		let finished = 0;
+		const getStatus = (promise: Promise<unknown>) =>
+			promise.then(
+				() => true,
+				error => {
+					reject(error);
+					return false;
+				}
+			);
 		if (maxConcurrency >= 1 && this.length > maxConcurrency) {
 			let index = 0;
 			const execute = async () => {
 				const idx = index++;
 				if (idx >= this.length)
 					return;
-				await callbackfn.call(thisArg, this[idx], idx, this);
-				++finished;
-				if (finished == this.length)
-					resolve();
-				else
-					execute();
+				const success = await getStatus(callbackfn.call(thisArg, this[idx], idx, this));
+				if (success) {
+					++finished;
+					if (finished == this.length)
+						resolve();
+					else
+						execute();
+				}
 			}
 			for (let i = 0; i < maxConcurrency; ++i)
 				execute();
 		}
 		else {
 			this.forEach(async (value, index, array) => {
-				await callbackfn(value, index, array);
+				const success = await getStatus(callbackfn(value, index, array));
+				if (!success)
+					return;
 				++finished;
 				if (finished == this.length)
 					resolve();
@@ -369,13 +381,15 @@ Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: 
 	});
 }
 
-Array.prototype.mapAsync = async function <T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]> {
+Array.prototype.mapAsync = function <T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]> {
 	const results = new Array<TResult>(this.length);
-	await this.forEachAsync(async (value, index, array) => {
-		const result = await callbackfn(value, index, array);
-		results[index] = result;
-	}, thisArg, options);
-	return results;
+	return new Promise((resolve, reject) => {
+		this.forEachAsync(async (value, index, array) => {
+			const result = await callbackfn(value, index, array);
+			results[index] = result;
+		}, thisArg, options)
+			.then(() => resolve(results), reject);
+	});
 }
 
 Array.prototype.binarySearch = function <T>(this: Array<T>, value: T, param2?: Comparer<T> | "upper" | "lower", param3?: Comparer<T>): number {
