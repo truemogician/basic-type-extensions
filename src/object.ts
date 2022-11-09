@@ -182,21 +182,3 @@ Object.delete = function <T extends object, K extends keyof T>(src: T, param: K 
 		delete src[key];
 	return src;
 }
-
-Object.prototype.let = function <T, R = any>(this: T, action: (it: T) => R): R {
-	return action(this);
-}
-
-Object.prototype.run = function <T, R = any>(this: T, action: (this: T) => R): R {
-	return action.call(this);
-}
-
-Object.prototype.apply = function <T>(this: T, action: (this: T) => any): T {
-	action.call(this);
-	return this;
-}
-
-Object.prototype.also = function <T>(this: T, action: (it: T) => any): T {
-	action(this);
-	return this;
-}

@@ -146,14 +146,4 @@ declare global {
 		 */
 		delete<T extends object, K extends keyof T>(src: T, keys: K[]): Omit<T, K>;
 	}
-
-	interface Object {
-		let<T, R = any>(this: T, action: (it: T) => R): R;
-
-		run<T, R = any>(this: T, action: (this: T) => R): R;
-
-		also<T>(this: T, action: (it: T) => any): T;
-
-		apply<T>(this: T, action: (this: T) => any): T;
-	}
 }
