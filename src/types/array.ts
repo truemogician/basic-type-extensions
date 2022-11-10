@@ -220,11 +220,11 @@ declare global {
 		 * ```
 		 * @return 
 		 * - #### Ascending array  
-		 *  The index of the first largest element that is less than or equal to `value`.  
+		 *  The index of the first element that is equal to or greater than `value`.  
 		 *  If `value` is less than the first element, `0` will be returned.  
 		 *  If `value` is greater than the last element, the length of the array will be returned.
 		 * - #### Descending array
-		 * 	The index of the first smallest element that is greater than or equal to `value`.  
+		 * 	The index of the first element that is smaller than or equal to `value`.  
 		 * 	If `value` is greater than the first element, `0` will be returned.  
 		 * 	If `value` is less than the last element, the length of the array will be returned.
 		 * 
@@ -244,15 +244,15 @@ declare global {
 		 * ```
 		 * @return 
 		 * - #### Ascending array
-		 *  The index of the first largest element that is less than or equal to `value` if `bound` is `"lower"`.  
-		 *  Or the index of the smallest element that is greater than `value` if `bound` is `"upper"`.  
-		 *  If `value` is less than the first element, `0` will be returned.  
+		 *  If `bound` is `"lower"`, the index of the first element that is equal to or greater than `value`.  
+		 *  If `bound` is `"upper"`, the index of the first element that is greater than `value` .  
+		 *  If `value` is smaller than the first element, `0` will be returned.  
 		 *  If `value` is greater than the last element, the length of the array will be returned.
 		 * - #### Descending array
-		 * 	The index of the first smallest element that is greater than or equal to `value` if `bound` is `"lower"`.  
-		 *  Or the index of the largest element that is less than `value` if `bound` is `"upper"`.  
+		 * 	If `bound` is `"lower"`, the index of the first element that is smaller than or equal to `value`.  
+		 *  If `bound` is `"upper"`, the index of the first element that is smaller than `value` .  
 		 * 	If `value` is greater than the first element, `0` will be returned.  
-		 * 	If `value` is less than the last element, the length of the array will be returned.
+		 * 	If `value` is smaller than the last element, the length of the array will be returned.
 		 * 
 		 * If the array is empty, `-1` will be returned.
 		 */
@@ -264,11 +264,11 @@ declare global {
 		 * @param selectors A series of key selector functions.
 		 * @return 
 		 * - #### Ascending array  
-		 *  The index of the first largest element that is less than or equal to `value`.  
+		 *  The index of the first element that is equal to or greater than `value`.  
 		 *  If `value` is less than the first element, `0` will be returned.  
 		 *  If `value` is greater than the last element, the length of the array will be returned.
 		 * - #### Descending array
-		 * 	The index of the first smallest element that is greater than or equal to `value`.  
+		 * 	The index of the first element that is smaller than or equal to `value`.  
 		 * 	If `value` is greater than the first element, `0` will be returned.  
 		 * 	If `value` is less than the last element, the length of the array will be returned.
 		 * 
@@ -283,15 +283,15 @@ declare global {
 		 * @param selectors A series of key selector functions.
 		 * @return 
 		 * - #### Ascending array
-		 *  The index of the first largest element that is less than or equal to `value` if `bound` is `"lower"`.  
-		 *  Or the index of the smallest element that is greater than `value` if `bound` is `"upper"`.  
-		 *  If `value` is less than the first element, `0` will be returned.  
+		 *  If `bound` is `"lower"`, the index of the first element that is equal to or greater than `value`.  
+		 *  If `bound` is `"upper"`, the index of the first element that is greater than `value` .  
+		 *  If `value` is smaller than the first element, `0` will be returned.  
 		 *  If `value` is greater than the last element, the length of the array will be returned.
 		 * - #### Descending array
-		 * 	The index of the first smallest element that is greater than or equal to `value` if `bound` is `"lower"`.  
-		 *  Or the index of the largest element that is less than `value` if `bound` is `"upper"`.  
+		 * 	If `bound` is `"lower"`, the index of the first element that is smaller than or equal to `value`.  
+		 *  If `bound` is `"upper"`, the index of the first element that is smaller than `value` .  
 		 * 	If `value` is greater than the first element, `0` will be returned.  
-		 * 	If `value` is less than the last element, the length of the array will be returned.
+		 * 	If `value` is smaller than the last element, the length of the array will be returned.
 		 * 
 		 * If the array is empty, `-1` will be returned.
 		 */
