@@ -9,6 +9,36 @@ export enum CleanOption {
 	All = (1 << 4) - 1
 }
 
+function compare<T>(a: T, b: T): number {
+	return a < b ? -1 : a > b ? 1 : 0;
+}
+
+function intersect<T = any>(...arrays: T[][]): T[] {
+	if (arrays.length == 0)
+		throw new Error("No array is provided.");
+	else if (arrays.length == 1)
+		return arrays[0];
+	let result = [...arrays[0]].sort(compare);
+	for (let k = 1; k < arrays.length; ++k) {
+		const tmp1 = result;
+		const tmp2 = [...arrays[k]].sort(compare);
+		result = new Array<T>();
+		for (let i = 0, j = 0; i < tmp1.length || j < tmp2.length;) {
+			if (tmp1[i] == tmp2[j]) {
+				result.push(tmp1[i]);
+				++i, ++j;
+			}
+			else if (i < tmp1.length && (j >= tmp2.length || tmp1[i] < tmp2[j]))
+				++i;
+			else
+				++j;
+		}
+		if (result.length == 0)
+			return result;
+	}
+	return result;
+}
+
 Object.isEmpty = function (value: any): boolean {
 	return value == null || Object.keys(value).length == 0;
 }
@@ -74,7 +104,7 @@ function innerAssign<T extends object>(target: T, config: Partial<Record<"getter
 			const accessors = getAccessorDescriptors(src, { getter: true })
 			srcKeys.push(...Object.keys(accessors));
 		}
-		const inter = Array.intersection(keys, srcKeys);
+		const inter = intersect(keys, srcKeys);
 		inter.forEach(key => (target as any)[key] = src[key]);
 	}
 	return target;
@@ -106,15 +136,15 @@ Object.rightAssign = function <T extends object, R extends object>(target: T, so
 		srcKeys.push(...Object.keys(accessors));
 	}
 	for (const key of srcKeys) {
-		const value = source[key];
+		const value = source[key as keyof R];
 		if (options?.nested) {
 			const dst = (target as any)[key];
-			if (typeof dst == "object" && typeof value == "object") {
+			if (dst != null && value != null && typeof dst == "object" && typeof value == "object") {
 				Object.rightAssign(dst, value, options);
 				continue;
 			}
 		}
-		(target as any)[key] = source[key];
+		(target as any)[key] = source[key as keyof R];
 	}
 	return target as T & R;
 }
