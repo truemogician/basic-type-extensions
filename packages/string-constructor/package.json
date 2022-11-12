@@ -1,8 +1,8 @@
 {
 	"name": "@basic-type-extensions/string-constructor",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Useful extensions for StringConstructor.",
-	"main": "lib/string.js",
+	"main": "lib/string-constructor.js",
 	"types": "lib/type.d.ts",
 	"scripts": {
 		"build": "tsc",
