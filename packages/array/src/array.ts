@@ -21,6 +21,15 @@ const keyOrderComparer = function <T>(...selectors: Selector<T>[]): Comparer<T> 
 	}
 }
 
+function toNumber(value: any): number {
+	switch (typeof value) {
+		case "number": return value
+		case "boolean": return Number(value)
+		case "string": return Number.parseFloat(value)
+		default: throw new Error(typeof value + " cannot be converted to number");
+	}
+}
+
 Array.prototype.last = function <T>(this: Array<T>, index: number = 0): T {
 	return this[this.length - index - 1];
 }
@@ -66,30 +75,14 @@ Array.prototype.removeAt = function <T>(this: Array<T>, ...indices: number[]): b
 
 Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
 	let result = 0;
-	if (!predicate)
-		predicate = value => {
-			switch (typeof value) {
-				case "number": return value
-				case "boolean": return Number(value)
-				case "string": return Number.parseFloat(value)
-				default: throw new Error(typeof value + " cannot be converted to number");
-			}
-		}
+	predicate ??= toNumber;
 	this.forEach(value => result += predicate!(value));
 	return result;
 }
 
 Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
 	let result = 1;
-	if (!predicate)
-		predicate = value => {
-			switch (typeof value) {
-				case "number": return value
-				case "boolean": return Number(value)
-				case "string": return Number.parseFloat(value)
-				default: throw new Error(typeof value + " cannot be converted to number");
-			}
-		}
+	predicate ??= toNumber;
 	this.forEach(value => result *= predicate!(value));
 	return result;
 }
@@ -143,11 +136,10 @@ Array.prototype.sortByKey = function <T>(this: Array<T>, ...keys: Selector<T>[])
 }
 
 Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
-	let temp: T;
 	for (let i = this.length, j; i > 0;) {
 		j = Math.floor(Math.random() * i);
 		--i;
-		temp = this[i];
+		const temp = this[i];
 		this[i] = this[j];
 		this[j] = temp;
 	}
