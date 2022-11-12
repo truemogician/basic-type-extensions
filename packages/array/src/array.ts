@@ -167,13 +167,8 @@ Array.prototype.repeat = function <T>(this: Array<T>, count: number = 1): T[] {
 }
 
 Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): boolean {
-	let tmp1 = new Array<T>(), tmp2 = new Array<T>();
-	Object.assign(tmp1, this);
-	if (!tmp1.isAscending())
-		tmp1.sortByKey();
-	Object.assign(tmp2, array);
-	if (!tmp2.isAscending())
-		tmp2.sortByKey();
+	const tmp1 = [...this].sort(defaultComparer);
+	const tmp2 = [...array].sort(defaultComparer);
 	for (let i = 0, j = 0; i < tmp1.length && j < tmp2.length;) {
 		if (tmp1[i] == tmp2[j])
 			return true;

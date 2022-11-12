@@ -1,7 +1,7 @@
 {
-	"name": "@basic-type-extensions/math",
+	"name": "@basic-type-extensions/array-constructor",
 	"version": "1.0.0",
-	"description": "Useful extensions for Math.",
+	"description": "Useful extensions for ArrayConstructor.",
 	"main": "lib/index.js",
 	"scripts": {
 		"build": "tsc",

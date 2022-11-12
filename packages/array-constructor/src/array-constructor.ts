@@ -1,20 +1,16 @@
+function compare<T>(a: T, b: T): number {
+	return a < b ? -1 : a > b ? 1 : 0;
+}
+
 Array.intersection = function <T = any>(...arrays: T[][]): T[] {
 	if (arrays.length == 0)
 		throw new Error("No array is provided.");
 	else if (arrays.length == 1)
 		return arrays[0];
-	let tmp1 = new Array<T>();
-	let tmp2 = new Array<T>();
-	let result = new Array<T>();
-	Object.assign(result, arrays[0]);
-	if (!result.isAscending())
-		result.sortByKey();
+	let result = [...arrays[0]].sort(compare);
 	for (let k = 1; k < arrays.length; ++k) {
-		tmp1 = result;
-		tmp2 = new Array<T>();
-		Object.assign(tmp2, arrays[k]);
-		if (!tmp2.isAscending())
-			tmp2.sortByKey();
+		const tmp1 = result;
+		const tmp2 = [...arrays[k]].sort(compare);
 		result = new Array<T>();
 		for (let i = 0, j = 0; i < tmp1.length || j < tmp2.length;) {
 			if (tmp1[i] == tmp2[j]) {
@@ -26,7 +22,7 @@ Array.intersection = function <T = any>(...arrays: T[][]): T[] {
 			else
 				++j;
 		}
-		if (!result.length)
+		if (result.length == 0)
 			return result;
 	}
 	return result;
@@ -37,18 +33,10 @@ Array.union = function <T = any>(...arrays: T[][]): T[] {
 		throw new Error("No array is provided.");
 	else if (arrays.length == 1)
 		return arrays[0];
-	let tmp1 = new Array<T>();
-	let tmp2 = new Array<T>();
-	let result = new Array<T>();
-	Object.assign(result, arrays[0]);
-	if (!result.isAscending())
-		result.sortByKey();
+	let result = [...arrays[0]].sort(compare);
 	for (let k = 1; k < arrays.length; ++k) {
-		tmp1 = result;
-		tmp2 = new Array<T>();
-		Object.assign(tmp2, arrays[k]);
-		if (!tmp2.isAscending())
-			tmp2.sortByKey();
+		const tmp1 = result;
+		const tmp2 = [...arrays[k]].sort(compare);
 		result = new Array<T>();
 		for (let i = 0, j = 0; i < tmp1.length || j < tmp2.length;) {
 			if (tmp1[i] == tmp2[j]) {
@@ -69,12 +57,8 @@ Array.complement = function <T = any>(source: T[], universal: T[]): T[] {
 		return [...universal];
 	if (universal == null || source.length > universal.length)
 		throw new Error("The source array is larger than the universal array.");
-	const src = [...source];
-	const dst = [...universal];
-	if (!src.isAscending())
-		src.sortByKey();
-	if (!dst.isAscending())
-		dst.sortByKey();
+	const src = [...source].sort(compare);
+	const dst = [...universal].sort(compare);
 	const result = new Array<T>();
 	let i = 0;
 	for (let j = 0; j < dst.length; ++j) {
@@ -93,12 +77,8 @@ Array.difference = function <T = any>(source: T[], target: T[]): T[] {
 		return [];
 	if (target == null || target.length == 0)
 		return [...source];
-	const src = [...source];
-	const dst = [...target];
-	if (!src.isAscending())
-		src.sortByKey();
-	if (!dst.isAscending())
-		dst.sortByKey();
+	const src = [...source].sort(compare);
+	const dst = [...target].sort(compare);
 	const result = new Array<T>();
 	for (let i = 0, j = 0; i < src.length; ++i) {
 		while (j < dst.length && dst[j] < src[i])
