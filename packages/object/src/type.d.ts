@@ -1,5 +1,5 @@
 import type { PartialDeep } from "type-fest";
-import type { CleanOption } from "../object";
+import type { CleanOption } from "./object";
 
 export interface RightAssignOptions {
 	/**

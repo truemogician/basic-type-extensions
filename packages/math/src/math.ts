@@ -1,4 +1,4 @@
-import "./types/math";
+import "./type";
 
 Math.randomInteger = function (param1: number, param2?: number): number {
 	const min = Math.ceil(param2 === undefined ? 0 : param1);

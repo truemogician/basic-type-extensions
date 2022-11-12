@@ -307,11 +307,12 @@ describe("Array<T>", () => {
 	});
 
 	describe("binarySearch", () => {
-		const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+		const arr = [0, 1, 2, 3, 4, 5, 6, 9];
 		const arr2 = [0, 1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5];
 		const arr3 = [6, 5, 5, 4, 2, 2, 2, 1, 0];
 		test("normal", () => {
 			expect(arr.binarySearch(5)).toBe(5);
+			expect(arr.binarySearch(7)).toBe(7);
 			expect(arr2.binarySearch(3)).toBe(5);
 		});
 
@@ -324,8 +325,8 @@ describe("Array<T>", () => {
 		test("endpoint", () => {
 			expect(arr.binarySearch(-1, "lower")).toBe(0);
 			expect(arr.binarySearch(-1, "upper")).toBe(0);
-			expect(arr.binarySearch(10, "lower")).toBe(10);
-			expect(arr.binarySearch(10, "upper")).toBe(10);
+			expect(arr.binarySearch(10, "lower")).toBe(8);
+			expect(arr.binarySearch(10, "upper")).toBe(8);
 		});
 
 		test("descending", () => {

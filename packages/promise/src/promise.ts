@@ -1,4 +1,4 @@
-import "./types/promise";
+import "./type";
 
 Promise.sleep = async function (milliseconds: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, milliseconds));

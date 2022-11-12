@@ -1,5 +1,5 @@
 import type { PartialDeep } from "type-fest";
-import type { RightAssignOptions } from "./types/object";
+import type { RightAssignOptions } from "./type";
 
 export enum CleanOption {
 	Undefined = 1 << 0,

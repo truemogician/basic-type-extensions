@@ -1,4 +1,4 @@
-import "./types/string";
+import "./type";
 
 String.empty = "";
 
@@ -22,8 +22,7 @@ String.prototype.remove = function (this: string, from: number, length?: number)
 String.prototype.splitAt = function (this: string, indices: number | number[], charAtIndex: "pred" | "succ" | "both" | "none" = "succ"): string[] {
 	if (typeof indices == "number")
 		indices = [indices];
-	if (!indices.isAscending())
-		indices.sortByKey();
+	indices.sort((a, b) => a - b);
 	let start = 0, end = 1;
 	for (let negative = indices[0] < 0; end < indices.length; negative = indices[end++] < 0) {
 		if (negative)
@@ -47,7 +46,7 @@ String.prototype.splitAt = function (this: string, indices: number | number[], c
 		if (start < end)
 			result.push(this.substring(start, end));
 	}
-	sub = this.substring(indices.last() + 1 - succ);
+	sub = this.substring(indices[indices.length - 1] + 1 - succ);
 	if (sub != "")
 		result.push(sub);
 	return result;

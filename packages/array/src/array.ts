@@ -1,4 +1,4 @@
-import type { AsyncOptions } from "./types/array";
+import type { AsyncOptions } from "./type";
 
 type Comparer<T> = (a: T, b: T) => number;
 type Selector<T, R = any> = (obj: T) => R;
@@ -88,12 +88,12 @@ Array.union = function <T = any>(...arrays: T[][]): T[] {
 }
 
 Array.complement = function <T = any>(source: T[], universal: T[]): T[] {
-	if (Object.isNullOrEmpty(source))
-		return Object.copy(universal);
-	if (Object.isNullOrEmpty(universal) || source.length > universal.length)
+	if (source == null || source.length == 0)
+		return [...universal];
+	if (universal == null || source.length > universal.length)
 		throw new Error("The source array is larger than the universal array.");
-	const src = Object.copy(source);
-	const dst = Object.copy(universal);
+	const src = [...source];
+	const dst = [...universal];
 	if (!src.isAscending())
 		src.sortByKey();
 	if (!dst.isAscending())
@@ -112,12 +112,12 @@ Array.complement = function <T = any>(source: T[], universal: T[]): T[] {
 }
 
 Array.difference = function <T = any>(source: T[], target: T[]): T[] {
-	if (Object.isNullOrEmpty(source))
+	if (source == null || source.length == 0)
 		return [];
-	if (Object.isNullOrEmpty(target))
-		return Object.copy(source);
-	const src = Object.copy(source);
-	const dst = Object.copy(target);
+	if (target == null || target.length == 0)
+		return [...source];
+	const src = [...source];
+	const dst = [...target];
 	if (!src.isAscending())
 		src.sortByKey();
 	if (!dst.isAscending())
