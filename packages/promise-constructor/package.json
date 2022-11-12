@@ -15,6 +15,11 @@
 		"type": "git",
 		"url": "https://github.com/truemogician/basic-type-extensions"
 	},
+	"keywords": [
+		"extension",
+		"promise-constructor",
+		"typescript"
+	],
 	"devDependencies": {
 		"typescript": "^4.8.4"
 	}
