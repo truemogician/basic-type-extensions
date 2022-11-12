@@ -1,1 +1,1 @@
-import "./promise";
+import "./promise-constructor";
