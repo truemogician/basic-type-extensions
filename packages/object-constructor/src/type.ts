@@ -1,6 +1,8 @@
 import type { PartialDeep } from "type-fest";
 import type { CleanOption } from "./object-constructor";
 
+export { CleanOption } from "./object-constructor";
+
 export interface RightAssignOptions {
 	/**
 	 * If `true`, right assignment will also be applied to object properties nestedly.
