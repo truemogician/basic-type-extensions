@@ -1,17 +1,15 @@
 {
-	"include": ["src/**/*.ts", "packages/*/src/**/*.ts"],
+	"include": ["src/**/*.ts"],
 	"compilerOptions": {
-		"target": "ES2017",
-		"module": "commonjs",
+		"target": "ESNext",
+		"module": "Node16",
 		"declaration": true,
 		"sourceMap": true,
 		"outDir": "lib",
 		"strict": true,
-		"noImplicitAny": false,
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true
 	}
 }
