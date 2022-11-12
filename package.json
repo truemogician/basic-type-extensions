@@ -1,7 +1,7 @@
 {
 	"name": "basic-type-extensions",
-	"version": "2.2.3",
-	"description": "Some useful extensions for Javascript/Typescript basic types",
+	"version": "3.0.0",
+	"description": "Some useful extensions for Javascript basic types with build-in Typescript support.",
 	"main": "lib/index.js",
 	"scripts": {
 		"test": "jest",
@@ -10,18 +10,31 @@
 	},
 	"author": "true_mogician",
 	"license": "MIT",
-	"homepage": "",
+	"homepage": "https://github.com/truemogician/basic-type-extensions",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truemogician/basic-type-extensions.git"
 	},
+	"keywords": [
+		"extensions",
+		"array",
+		"array-constructor",
+		"math",
+		"object-constructor",
+		"promise-constructor",
+		"string-constructor",
+		"typescript"
+	],
 	"dependencies": {
-		"lodash.clonedeep": "^4.5.0",
-		"type-fest": "^3.1.0"
+		"@basic-type-extensions/array": "^1.0.3",
+		"@basic-type-extensions/array-constructor": "^1.0.2",
+		"@basic-type-extensions/math": "^1.0.2",
+		"@basic-type-extensions/object-constructor": "^1.0.3",
+		"@basic-type-extensions/promise-constructor": "^1.0.2",
+		"@basic-type-extensions/string-constructor": "^1.0.3"
 	},
 	"devDependencies": {
 		"@types/jest": "^29.2.1",
-		"@types/lodash.clonedeep": "^4.5.7",
 		"@types/node": "^18.11.9",
 		"jest": "^29.2.2",
 		"ts-jest": "^29.0.3",
