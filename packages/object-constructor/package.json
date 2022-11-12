@@ -9,7 +9,7 @@
 	},
 	"author": "true_mogician",
 	"license": "MIT",
-	"homepage": "https://github.com/truemogician/basic-type-extensions",
+	"homepage": "https://github.com/truemogician/basic-type-extensions/tree/main/packages/object-constructor",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truemogician/basic-type-extensions"
