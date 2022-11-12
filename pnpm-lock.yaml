@@ -66,6 +66,12 @@ importers:
     devDependencies:
       typescript: 4.8.4
 
+  packages/scope-functions:
+    specifiers:
+      typescript: ^4.8.4
+    devDependencies:
+      typescript: 4.8.4
+
   packages/string-constructor:
     specifiers:
       typescript: ^4.8.4

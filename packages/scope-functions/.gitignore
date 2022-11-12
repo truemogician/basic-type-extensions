@@ -1,0 +1,7 @@
+.vscode
+coverage
+lib
+node_modules
+*.js
+!*.config.js
+*.js.map

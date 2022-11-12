@@ -1,0 +1,26 @@
+{
+	"name": "@basic-type-extensions/scope-functions",
+	"version": "1.0.0",
+	"description": "Add Kotlin-like scope functions to Object.",
+	"main": "lib/index.js",
+	"scripts": {
+		"build": "tsc",
+		"prepublishOnly": "npm run build"
+	},
+	"author": "true_mogician",
+	"license": "MIT",
+	"homepage": "https://github.com/truemogician/basic-type-extensions/tree/main/packages/scope-functions",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/truemogician/basic-type-extensions"
+	},
+	"keywords": [
+		"extension",
+		"object",
+		"scope-functions",
+		"typescript"
+	],
+	"devDependencies": {
+		"typescript": "^4.8.4"
+	}
+}
