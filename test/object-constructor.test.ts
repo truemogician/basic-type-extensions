@@ -16,6 +16,8 @@ let obj3 = {
 	key5: {}
 };
 
+const tuple = <T extends any[]>(...args: T): T => args;
+
 test("isEmpty", () => {
 	expect(Object.isEmpty([])).toBeTruthy();
 	expect(Object.isEmpty({})).toBeTruthy();
@@ -150,18 +152,18 @@ describe("copy", () => {
 	});
 
 	test("object", () => {
-		const obj = [false, "1", 2, [3], { 4: null }];
+		const obj = tuple(false, "1", 2, [3], { 4: null as object | null });
 		const result = Object.copy(obj);
 		expect(result[3]).toBe(obj[3]);
-		result[4]["4"] = {};
-		expect(obj[4]["4"]).not.toBe(null);
+		result[4][4] = {};
+		expect(obj[4][4]).not.toBe(null);
 	});
 
 	test("function", () => {
 		const func = function () { };
 		const result = Object.copy(func);
-		result["key"] = "value";
-		expect(func["key"]).toBe(undefined);
+		(result as any)["key"] = "value";
+		expect((func as any)["key"]).toBe(undefined);
 	})
 })
 
@@ -318,12 +320,4 @@ describe("remove", () => {
 		const result = Object.delete(obj, ["a", "b"]);
 		expect(Object.keys(result)).toEqual(["c"]);
 	});
-});
-
-describe("scope functions", () => {
-	const obj = { a: 1, b: true };
-	test("let", () => expect(obj.let(o => o.a)).toBe(1));
-	test("run", () => expect(obj.run(function () { return this.a; })).toBe(1));
-	test("also", () => expect(obj.also(o => o.a)).toBe(obj));
-	test("apply", () => expect(obj.apply(function () { return this.a; })).toBe(obj));
 });
