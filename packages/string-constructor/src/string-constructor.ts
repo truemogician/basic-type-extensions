@@ -1,5 +1,3 @@
-import "./type";
-
 String.empty = "";
 
 String.isNullOrEmpty = function (value: string | null | undefined): boolean {

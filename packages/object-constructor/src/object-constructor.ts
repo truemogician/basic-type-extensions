@@ -1,5 +1,13 @@
 import type { PartialDeep } from "type-fest";
-import { CleanOption, type RightAssignOptions } from "./type";
+import type { RightAssignOptions } from "./type";
+
+export enum CleanOption {
+	Undefined = 1 << 0,
+	Null = 1 << 1,
+	EmptyObject = 1 << 2,
+	EmptyString = 1 << 3,
+	All = (1 << 4) - 1
+}
 
 function compare<T>(a: T, b: T): number {
 	return a < b ? -1 : a > b ? 1 : 0;

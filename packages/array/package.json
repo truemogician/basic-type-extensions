@@ -1,8 +1,9 @@
 {
 	"name": "@basic-type-extensions/array",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Useful extensions for Array and ReadonlyArray.",
-	"main": "lib/index.js",
+	"main": "lib/array.js",
+	"types": "lib/type.d.ts",
 	"scripts": {
 		"build": "tsc",
 		"prepublishOnly": "npm run build"

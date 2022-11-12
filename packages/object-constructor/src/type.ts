@@ -1,12 +1,5 @@
 import type { PartialDeep } from "type-fest";
-
-export enum CleanOption {
-	Undefined = 1 << 0,
-	Null = 1 << 1,
-	EmptyObject = 1 << 2,
-	EmptyString = 1 << 3,
-	All = (1 << 4) - 1
-}
+import type { CleanOption } from "./object-constructor";
 
 export interface RightAssignOptions {
 	/**

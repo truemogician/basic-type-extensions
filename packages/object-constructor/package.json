@@ -1,8 +1,9 @@
 {
 	"name": "@basic-type-extensions/object-constructor",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Useful extensions for ObjectConstructor.",
-	"main": "lib/index.js",
+	"main": "lib/object-constructor.js",
+	"types": "lib/type.d.ts",
 	"scripts": {
 		"build": "tsc",
 		"prepublishOnly": "npm run build"
