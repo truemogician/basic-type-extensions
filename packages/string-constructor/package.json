@@ -1,6 +1,6 @@
 {
 	"name": "@basic-type-extensions/string-constructor",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Useful extensions for StringConstructor.",
 	"main": "lib/index.js",
 	"scripts": {

@@ -1,6 +1,6 @@
 {
 	"name": "@basic-type-extensions/math",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Useful extensions for Math.",
 	"main": "lib/index.js",
 	"scripts": {

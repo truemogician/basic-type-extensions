@@ -1,2 +1,3 @@
-export { CleanOption } from "./object-constructor";
-export type { RightAssignOptions } from "./type";
+import "./object-constructor";
+
+export { CleanOption, type RightAssignOptions } from "./type";

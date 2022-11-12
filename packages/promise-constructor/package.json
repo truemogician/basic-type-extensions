@@ -1,6 +1,6 @@
 {
 	"name": "@basic-type-extensions/promise-constructor",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Useful extensions for PromiseConstructor.",
 	"main": "lib/index.js",
 	"scripts": {
