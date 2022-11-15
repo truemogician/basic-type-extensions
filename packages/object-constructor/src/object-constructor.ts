@@ -39,19 +39,35 @@ function intersect<T = any>(...arrays: T[][]): T[] {
 	return result;
 }
 
-Object.isEmpty = function (value: any): boolean {
-	return value == null || Object.keys(value).length == 0;
+Object.isEmpty = function (obj?: object | null): boolean {
+	return obj == null || Reflect.ownKeys(obj).length == 0;
 }
 
-Object.isNullOrUndefined = function (value: any): boolean {
+Object.hasProperties = function (obj?: object | null): obj is object {
+	return obj != null && Reflect.ownKeys(obj).length > 0;
+}
+
+Object.isEnumerablyEmpty = function (obj?: object | null): boolean {
+	if (obj == null)
+		return true;
+	for (const _ in obj)
+		return false;
+	const symbols = Object.getOwnPropertySymbols(obj);
+	for (const symbol of symbols)
+		if (Object.getOwnPropertyDescriptor(obj, symbol)?.enumerable)
+			return false;
+	return true;
+}
+
+Object.hasEnumerableProperties = function (obj?: object | null): obj is object {
+	return !Object.isEnumerablyEmpty(obj);
+}
+
+Object.isNullOrUndefined = function (value: any): value is null | undefined {
 	return value == null;
 }
 
-Object.isNullOrEmpty = function (value: any): boolean {
-	return value == null || Object.keys(value).length == 0;
-}
-
-Object.isPrimitive = function (value: any): boolean {
+Object.isPrimitive = function (value: any): value is undefined | null | boolean | number | string | symbol | bigint {
 	if (value === null)
 		return true;
 	const type = typeof value;

@@ -20,25 +20,45 @@ type StringKeyObject<TValue = any> = { [K: string]: TValue; }
 declare global {
 	interface ObjectConstructor {
 		/**
-		 * Checks whether `value` is empty, which means it has no enumerable properties. 
-		 * @note If `value` is `null` or `undefined`, it will be considered empty.
+		 * Checks whether an object is empty, which means it has no properties, both enumerable and non-enumerable.
+		 * @note Symbol properties are also checked.
+		 * @note `null` and `undefined` are also considered empty.
+		 * @note Empty arrays have an enumerable property `length` with value `0`, so they are not considered empty.  
+		 * To include empty arrays, use `Object.isEnumerablyEmpty` instead.
 		 */
-		isEmpty(value: any): boolean;
+		isEmpty(obj?: object | null): boolean;
+
+		/**
+		 * Checks whether an object has at least one property, both enumerable and non-enumerable.
+		 * @note Symbol properties are also checked.
+		 * @note Empty arrays have an enumerable property `length` with value `0`, so they are considered to have properties.  
+		 * To exclude empty arrays, use `Object.hasEnumerableProperties` instead.
+		 */
+		hasProperties(obj?: object | null): obj is object;
+
+		/**
+		 * Checks whether an object is enumerably empty, which means it has no enumerable properties. 
+		 * @note Enumerable symbol properties are also checked.
+		 * @note `null` and `undefined` are also considered empty.
+		 */
+		isEnumerablyEmpty(obj?: object | null): boolean;
+
+		/**
+		 * Checks whether an object has at least one enumerable property.
+		 * @note Enumerable symbol properties are also checked.
+		 */
+		hasEnumerableProperties(obj?: object | null): obj is object;
 
 		/**
 		 * Checks whether `value` is `null` or `undefined`.
 		 */
-		isNullOrUndefined(value: any): boolean;
+		isNullOrUndefined(value: any): value is null | undefined;
 
 		/**
-		 * Checks whether `value` has no properties or is `null` or `undefined`
+		 * Checks whether `value` is a primitive value, which means it is not an object or a function.
+		 * @note `null` is considered a primitive value, though `typeof null` is `"object"`.
 		 */
-		isNullOrEmpty(value: any): boolean;
-
-		/**
-		 * Checks whether `value` is a primitive value.
-		 */
-		isPrimitive(value: any): boolean;
+		isPrimitive(value: any): value is undefined | null | boolean | number | string | symbol | bigint;
 
 		/**
 		 * Returns an object containing all accessor descriptors of an object.

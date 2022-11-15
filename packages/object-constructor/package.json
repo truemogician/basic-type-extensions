@@ -1,6 +1,6 @@
 {
 	"name": "@basic-type-extensions/object-constructor",
-	"version": "1.0.3",
+	"version": "2.0.0",
 	"description": "Useful extensions for ObjectConstructor.",
 	"main": "lib/object-constructor.js",
 	"types": "lib/type.d.ts",
