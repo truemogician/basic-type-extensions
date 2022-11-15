@@ -18,25 +18,41 @@ let obj3 = {
 
 const tuple = <T extends any[]>(...args: T): T => args;
 
-test("isEmpty", () => {
-	expect(Object.isEmpty([])).toBeTruthy();
+test("isEmpty & hasProperties", () => {
+	expect(Object.isEmpty([])).toBeFalsy();
+	expect(Object.hasProperties([])).toBeTruthy();
 	expect(Object.isEmpty({})).toBeTruthy();
+	expect(Object.hasProperties({})).toBeFalsy();
 	expect(Object.isEmpty(["a"])).toBeFalsy();
-	expect(Object.isEmpty(123)).toBeTruthy();
+	expect(Object.hasProperties(["a"])).toBeTruthy();
+	const symbolObj = {};
+	Object.defineProperty(symbolObj, Symbol(), { value: 1, enumerable: false });
+	expect(Object.isEmpty(symbolObj)).toBeFalsy();
+	expect(Object.hasProperties(symbolObj)).toBeTruthy();
 });
+
+test("isEnumerablyEmpty & hasEnumerableProperties", () => {
+	expect(Object.isEnumerablyEmpty([])).toBeTruthy();
+	expect(Object.hasEnumerableProperties([])).toBeFalsy();
+	expect(Object.isEnumerablyEmpty({})).toBeTruthy();
+	expect(Object.hasEnumerableProperties({})).toBeFalsy();
+	expect(Object.isEnumerablyEmpty(["a"])).toBeFalsy();
+	expect(Object.hasEnumerableProperties(["a"])).toBeTruthy();
+	const symbolObj = {};
+	const sym = Symbol();
+	Object.defineProperty(symbolObj, sym, { value: 1, enumerable: false, configurable: true });
+	expect(Object.isEnumerablyEmpty(symbolObj)).toBeTruthy();
+	expect(Object.hasEnumerableProperties(symbolObj)).toBeFalsy();
+	Object.defineProperty(symbolObj, sym, { enumerable: true });
+	expect(Object.isEnumerablyEmpty(symbolObj)).toBeFalsy();
+	expect(Object.hasEnumerableProperties(symbolObj)).toBeTruthy();
+})
 
 test("isNullOrUndefined", () => {
 	let obj!: object;
 	expect(Object.isNullOrUndefined(obj)).toBeTruthy();
 	expect(Object.isNullOrUndefined({})).toBeFalsy();
 	expect(Object.isNullOrUndefined(null)).toBeTruthy();
-});
-
-test("isNullOrEmpty", () => {
-	let obj!: object;
-	expect(Object.isNullOrEmpty(obj)).toBeTruthy();
-	expect(Object.isNullOrEmpty({})).toBeTruthy();
-	expect(Object.isNullOrEmpty(null)).toBeTruthy();
 });
 
 test("isPrimitive", () => {
