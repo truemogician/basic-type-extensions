@@ -40,18 +40,27 @@ declare global {
 
 Object.prototype.let = function <T, R = any>(this: T, action: (it: T) => R): R {
 	return action(this);
-}
+};
 
 Object.prototype.run = function <T, R = any>(this: T, action: (this: T) => R): R {
 	return action.call(this);
-}
+};
 
 Object.prototype.apply = function <T>(this: T, action: (this: T) => any): T {
 	action.call(this);
 	return this;
-}
+};
 
 Object.prototype.also = function <T>(this: T, action: (it: T) => any): T {
 	action(this);
 	return this;
-}
+};
+
+(function <T extends object, K extends keyof T>(obj: T, ...keys: K[]): void {
+	for (const key of keys)
+		Object.defineProperty(obj, key, {
+			configurable: true,
+			enumerable: false,
+			writable: false
+		});
+})(Object.prototype, "let", "run", "apply", "also");
