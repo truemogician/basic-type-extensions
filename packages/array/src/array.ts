@@ -5,7 +5,7 @@ type Selector<T, R = any> = (obj: T) => R;
 
 const defaultComparer = function <T>(a: T, b: T): number {
 	return a < b ? -1 : a > b ? 1 : 0;
-}
+};
 
 const keyOrderComparer = function <T>(...selectors: Selector<T>[]): Comparer<T> {
 	return (a, b) => {
@@ -19,7 +19,7 @@ const keyOrderComparer = function <T>(...selectors: Selector<T>[]): Comparer<T> 
 		}
 		return 0;
 	}
-}
+};
 
 function toNumber(value: any): number {
 	switch (typeof value) {
@@ -32,20 +32,20 @@ function toNumber(value: any): number {
 
 Array.prototype.last = function <T>(this: Array<T>, index: number = 0): T {
 	return this[this.length - index - 1];
-}
+};
 
 Array.prototype.insert = function <T>(this: Array<T>, value: T, compareFn?: Comparer<T>): number {
 	const index = this.binarySearch(value, compareFn);
 	this.splice(index, 0, value);
 	return index;
-}
+};
 
 Array.prototype.insertAt = function <T>(this: Array<T>, value: T, index: number): boolean {
 	if (index < 0 || index >= this.length || !Number.isSafeInteger(index))
 		return false;
 	this.splice(index, 0, value);
 	return true;
-}
+};
 
 Array.prototype.remove = function <T>(this: Array<T>, ...values: T[]): number {
 	const set = new Set(values);
@@ -55,7 +55,7 @@ Array.prototype.remove = function <T>(this: Array<T>, ...values: T[]): number {
 			indices.push(i);
 	this.removeAt(...indices);
 	return indices.length;
-}
+};
 
 Array.prototype.removeAt = function <T>(this: Array<T>, ...indices: number[]): boolean {
 	if (indices.some(idx => idx < 0 || idx >= this.length || !Number.isSafeInteger(idx)))
@@ -71,21 +71,21 @@ Array.prototype.removeAt = function <T>(this: Array<T>, ...indices: number[]): b
 		this.length -= count;
 	}
 	return true;
-}
+};
 
 Array.prototype.sum = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
 	let result = 0;
 	predicate ??= toNumber;
 	this.forEach(value => result += predicate!(value));
 	return result;
-}
+};
 
 Array.prototype.product = function <T>(this: Array<T>, predicate?: (value: T) => number): number {
 	let result = 1;
 	predicate ??= toNumber;
 	this.forEach(value => result *= predicate!(value));
 	return result;
-}
+};
 
 Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]) {
 	if (!this?.length)
@@ -99,7 +99,7 @@ Array.prototype.minimum = function <T>(this: Array<T>, func?: Comparer<T> | Sele
 			result = this[i];
 	}
 	return result;
-}
+};
 
 Array.prototype.maximum = function <T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]) {
 	if (!this?.length)
@@ -113,7 +113,7 @@ Array.prototype.maximum = function <T>(this: Array<T>, func?: Comparer<T> | Sele
 			result = this[i];
 	}
 	return result;
-}
+};
 
 Array.prototype.groupBy = function <T, U>(this: Array<T>, key: (obj: T) => U): Map<U, T[]> {
 	const map = new Map();
@@ -126,14 +126,14 @@ Array.prototype.groupBy = function <T, U>(this: Array<T>, key: (obj: T) => U): M
 			map.set(k, [item]);
 	}
 	return map;
-}
+};
 
 Array.prototype.sortByKey = function <T>(this: Array<T>, ...keys: Selector<T>[]): T[] {
 	if (!this || this.length < 2)
 		return this;
 	const compare = keys?.length ? keyOrderComparer(...keys) : defaultComparer;
 	return this.sort(compare);
-}
+};
 
 Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
 	for (let i = this.length, j; i > 0;) {
@@ -144,7 +144,7 @@ Array.prototype.shuffle = function <T>(this: Array<T>): T[] {
 		this[j] = temp;
 	}
 	return this;
-}
+};
 
 Array.prototype.repeat = function <T>(this: Array<T>, count: number = 1): T[] {
 	if (count < 0)
@@ -156,7 +156,7 @@ Array.prototype.repeat = function <T>(this: Array<T>, count: number = 1): T[] {
 		result[i] = this[j];
 	}
 	return result;
-}
+};
 
 Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): boolean {
 	const tmp1 = [...this].sort(defaultComparer);
@@ -170,7 +170,7 @@ Array.prototype.intersects = function <T>(this: Array<T>, array: Array<T>): bool
 			++j;
 	}
 	return false;
-}
+};
 
 Array.prototype.isAscending = function <T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]): boolean {
 	let compare: Comparer<T> = !func
@@ -180,7 +180,7 @@ Array.prototype.isAscending = function <T>(this: Array<T>, func?: Comparer<T> | 
 		if (compare(this[i - 1], this[i]) > 0)
 			return false;
 	return true;
-}
+};
 
 Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]): boolean {
 	let compare: Comparer<T> = !func
@@ -190,7 +190,7 @@ Array.prototype.isDescending = function <T>(this: Array<T>, func?: Comparer<T> |
 		if (compare(this[i - 1], this[i]) < 0)
 			return false;
 	return true;
-}
+};
 
 Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any, options?: AsyncOptions): Promise<void> {
 	if (this.length == 0)
@@ -235,7 +235,7 @@ Array.prototype.forEachAsync = function <T>(this: Array<T>, callbackfn: (value: 
 			}, thisArg)
 		}
 	});
-}
+};
 
 Array.prototype.mapAsync = function <T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]> {
 	const results = new Array<TResult>(this.length);
@@ -246,7 +246,7 @@ Array.prototype.mapAsync = function <T, TResult>(this: Array<T>, callbackfn: (va
 		}, thisArg, options)
 			.then(() => resolve(results), reject);
 	});
-}
+};
 
 Array.prototype.binarySearch = function <T>(this: Array<T>, value: T, param2?: Comparer<T> | "upper" | "lower", param3?: Comparer<T>): number {
 	if (this.length == 0)
@@ -272,13 +272,13 @@ Array.prototype.binarySearch = function <T>(this: Array<T>, value: T, param2?: C
 		}
 	}
 	return left;
-}
+};
 
 Array.prototype.binarySearchByKey = function <T>(this: Array<T>, value: T, param1?: Selector<T> | "upper" | "lower", ...param2: Selector<T>[]): number {
 	const bound = typeof param1 == "string" ? param1 : "lower";
 	const selectors = typeof param1 == "function" ? [param1, ...param2] : param2;
 	return this.binarySearch(value, bound, keyOrderComparer(...selectors));
-}
+};
 
 Array.prototype.ternarySearch = function <T>(this: Array<T>, param1?: Comparer<T> | "upper" | "lower", param2?: Comparer<T>): number {
 	if (this.length <= 1)
@@ -314,10 +314,43 @@ Array.prototype.ternarySearch = function <T>(this: Array<T>, param1?: Comparer<T
 				left = mid1 + 1;
 		}
 	}
-}
+};
 
 Array.prototype.ternarySearchByKey = function <T>(this: Array<T>, param1?: Selector<T> | "upper" | "lower", ...param2: Selector<T>[]): number {
 	const bound = typeof param1 == "string" ? param1 : "lower";
 	const selectors = typeof param1 == "function" ? [param1, ...param2] : param2;
 	return this.ternarySearch(bound, keyOrderComparer(...selectors));
-}
+};
+
+const extensions: (keyof typeof Array.prototype)[] = [
+	"last",
+	"minimum",
+	"maximum",
+	"sum",
+	"product",
+	"groupBy",
+	"repeat",
+	"intersects",
+	"isAscending",
+	"isDescending",
+	"forEachAsync",
+	"mapAsync",
+	"binarySearch",
+	"binarySearchByKey",
+	"ternarySearch",
+	"ternarySearchByKey",
+	"insert",
+	"insertAt",
+	"remove",
+	"removeAt",
+	"sortByKey",
+	"shuffle"
+];
+
+// Configure extension functions
+for (const ext of extensions)
+	Object.defineProperty(Array.prototype, ext, {
+		configurable: true,
+		enumerable: false,
+		writable: false
+	});
