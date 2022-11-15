@@ -1,6 +1,6 @@
 {
 	"name": "@basic-type-extensions/string-constructor",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Useful extensions for StringConstructor.",
 	"main": "lib/string-constructor.js",
 	"types": "lib/type.d.ts",

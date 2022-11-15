@@ -1,6 +1,6 @@
 String.empty = "";
 
-String.isNullOrEmpty = function (value: string | null | undefined): boolean {
+String.isNullOrEmpty = function (value: string | null | undefined): value is null | undefined | "" {
 	return value == null || value == "";
 }
 

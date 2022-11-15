@@ -5,17 +5,17 @@ declare global {
 		/**
 		 * The empty string.
 		 */
-		empty: string;
+		empty: "";
 
 		/**
-		 * Checks whether a string is `null` or empty
-		 * @param value String to check.
+		 * Checks whether a string is `null`, `undefined` or empty
+		 * @param value A string to be checked.
 		 */
-		isNullOrEmpty(value: string | null | undefined): boolean;
+		isNullOrEmpty(value: string | null | undefined): value is null | undefined | "";
 
 		/**
-		 * Checks whether a string is `null` or whitespace.
-		 * @param value String to check.
+		 * Checks whether a string is `null`, `undefined` or whitespace.
+		 * @param value A string to be checked.
 		 */
 		isNullOrWhiteSpace(value: string | null | undefined): boolean;
 	}
