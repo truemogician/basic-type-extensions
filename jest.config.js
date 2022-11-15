@@ -3,4 +3,7 @@ module.exports = {
 	testEnvironment: "node",
 	collectCoverage: true,
 	coverageDirectory: "coverage",
+	transform: {
+		"\\.ts$": ["ts-jest", { tsconfig: "tsconfig.json" }],
+	},
 };
