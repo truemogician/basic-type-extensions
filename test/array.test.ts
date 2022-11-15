@@ -297,3 +297,20 @@ describe("ternarySearch", () => {
 		expect(new Array<number>().ternarySearch()).toBe(-1);
 	});
 });
+
+describe("extension decriptors", () => {
+	test("enumerability", () => {
+		const arr = new Array<any>();
+		const keys = new Array<string>();
+		for (const key in arr)
+			keys.push(key);
+		expect(keys.length).toBe(0);
+		expect(Object.keys(Array.prototype).length).toBe(0);
+	});
+
+	test("writability", () => {
+		expect(() => {
+			Array.prototype.last = () => 1;
+		}).toThrow();
+	});
+});
