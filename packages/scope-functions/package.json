@@ -1,6 +1,6 @@
 {
 	"name": "@basic-type-extensions/scope-functions",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"description": "Add Kotlin-like scope functions to Object.",
 	"main": "lib/index.js",
 	"scripts": {
