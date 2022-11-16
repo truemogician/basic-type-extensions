@@ -2,9 +2,10 @@ import Path from "path";
 import FileManagerPlugin from "filemanager-webpack-plugin";
 import type { Configuration } from "webpack";
 
-const outputRoot = Path.resolve(__dirname, "../lib");
+const outputRoot = Path.resolve(__dirname, "lib");
 const config: Configuration = {
-	entry: Path.resolve(__dirname, "../src/array.ts"),
+	mode: "production",
+	entry: Path.resolve(__dirname, "src/array.ts"),
 	module: {
 		rules: [
 			{
@@ -20,16 +21,21 @@ const config: Configuration = {
 	output: {
 		filename: "array.js",
 		path: outputRoot,
+		iife: false,
 		clean: true
+	},
+	devtool: "source-map",
+	optimization: {
+		minimize: false
 	},
 	plugins: [
 		new FileManagerPlugin({
 			events: {
 				onEnd: [
 					{
-						copy: [{
-							source: Path.resolve(outputRoot, "src/type.d.ts"),
-							destination: Path.resolve(outputRoot, "type.d.ts"),
+						move: [{
+							source: Path.resolve(outputRoot, "src/types.d.ts"),
+							destination: Path.resolve(outputRoot, "types.d.ts"),
 						}]
 					},
 					{
