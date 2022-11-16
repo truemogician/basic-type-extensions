@@ -1,4 +1,5 @@
 import "../src";
+import { dependencies } from "../package.json";
 
 const arrays: readonly (readonly number[])[] = [
 	[0, 1, 2, 3, 4],
@@ -309,8 +310,15 @@ describe("extension decriptors", () => {
 	});
 
 	test("writability", () => {
-		expect(() => {
-			Array.prototype.last = () => 1;
-		}).toThrow();
+		const descriptor = Object.getOwnPropertyDescriptor(Array.prototype, "last");
+		expect(descriptor!.writable).toBeTruthy();
+	});
+
+	test("version check", () => {
+		const key = "ArrayExtensionsVersion";
+		const symbol = Object.getOwnPropertySymbols(Array.prototype).find(x => x.description === key);
+		expect(symbol).toBeDefined();
+		const versionCheck = Array.prototype[symbol as any];
+		expect(typeof versionCheck == "string" && dependencies["@basic-type-extensions/array"].endsWith(versionCheck)).toBeTruthy();
 	});
 });
