@@ -3,7 +3,7 @@
 	"version": "1.2.0",
 	"description": "Useful extensions for Array and ReadonlyArray.",
 	"main": "lib/array.js",
-	"types": "lib/type.d.ts",
+	"types": "lib/types.d.ts",
 	"scripts": {
 		"build": "webpack --config webpack/webpack.prod.ts",
 		"build:dev": "webpack --config webpack/webpack.dev.ts",

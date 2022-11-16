@@ -1,4 +1,4 @@
-import type { AsyncOptions } from "./type";
+import type { AsyncOptions } from "./types";
 import { version } from "../package.json";
 
 type Comparer<T> = (a: T, b: T) => number;
