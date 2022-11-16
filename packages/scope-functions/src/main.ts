@@ -137,6 +137,3 @@ export function disableScopeFunctions(action?: () => void | Promise<any>): void 
 		return result.then(enable);
 	enable();
 }
-
-// Enable scope functions by default
-enable();
