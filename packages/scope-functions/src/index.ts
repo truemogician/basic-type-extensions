@@ -36,54 +36,53 @@ declare global {
 	}
 }
 
-function lett<T, R = any>(this: T, action: (it: T) => R): R {
-	return action(this);
-}
+const extensions = (<K extends keyof typeof Object.prototype>(e: Pick<typeof Object.prototype, K>) => e)({
+	let<T, R = any>(this: T, action: (it: T) => R): R {
+		return action(this);
+	},
 
-function run<T, R = any>(this: T, action: (this: T) => R): R {
-	return action.call(this);
-}
+	run<T, R = any>(this: T, action: (this: T) => R): R {
+		return action.call(this);
+	},
 
-function apply<T>(this: T, action: (this: T) => any): T {
-	action.call(this);
-	return this;
-}
+	apply<T>(this: T, action: (this: T) => any): T {
+		action.call(this);
+		return this;
+	},
 
-function also<T>(this: T, action: (it: T) => any): T {
-	action(this);
-	return this;
-}
-
-function configure<T extends object, K extends keyof T>(obj: T, ...keys: K[]): void {
-	for (const key of keys)
-		Object.defineProperty(obj, key, {
-			configurable: true,
-			enumerable: false,
-			writable: false
-		});
-}
+	also<T>(this: T, action: (it: T) => any): T {
+		action(this);
+		return this;
+	},
+});
 
 let enabled = false;
 
-function enable() {
+function enable(existing: "override" | "throw" = "throw"): void {
 	if (enabled)
 		return;
-	Object.prototype.let = lett;
-	Object.prototype.run = run;
-	Object.prototype.also = also;
-	Object.prototype.apply = apply;
-	configure(Object.prototype, "let", "run", "also", "apply");
+	const proto = Object.prototype;
+	let name: keyof typeof extensions;
+	for (name in extensions) {
+		if (proto[name] && existing == "throw") {
+			if (proto[name].toString() != extensions[name].toString())
+				throw new Error(`Object.prototype.${name} already assigned with different implementation`);
+		}
+		Object.defineProperty(proto, name, {
+			value: extensions[name],
+			enumerable: false,
+			configurable: true,
+			writable: true,
+		});
+	}
 	enabled = true;
 }
 
 function disable() {
-	if (!enabled)
-		return;
 	const proto = Object.prototype as Partial<Object>;
-	delete proto.let;
-	delete proto.run;
-	delete proto.also;
-	delete proto.apply;
+	let name: keyof typeof extensions;
+	for (name in extensions)
+		delete proto[name];
 	enabled = false;
 }
 
