@@ -97,17 +97,13 @@ describe("removeAt", () => {
 describe("sum", () => {
 	test("default", () => expect([true, 2, "3"].sum()).toBe(6));
 
-	test("other", () => expect(() => { [[0], { key: "value" }].sum() }).toThrow());
-
-	test("map", () => { expect(arrays[2].sum(num => num == 1 ? 1 : 0)).toBe(3) });
+	test("selector", () => { expect(arrays[2].sum(num => num == 1 ? 1 : 0)).toBe(3) });
 });
 
 describe("product", () => {
 	test("default", () => expect([true, 3, "5"].product()).toBe(15));
 
-	test("other", () => expect(() => { [[0], { key: "value" }].product() }).toThrow());
-
-	test("map", () => expect(arrays[2].product(num => num == 1 ? 2 : 1)).toBe(8));
+	test("selector", () => expect(arrays[2].product(num => num == 1 ? 2 : 1)).toBe(8));
 });
 
 describe("minimum & maximum", () => {
@@ -187,6 +183,36 @@ describe("intersects", () => {
 		expect([].intersects([])).toBeFalsy();
 	})
 });
+
+describe("subset and superset", () => {
+	test("general", () => {
+		const arr1 = [1, 9, 2, 6, 0, 8, 1, 7];
+		const arr2 = [0, 1, 1, 2];
+		const arr3 = [0, 0];
+		expect(arr2.isSubsetOf(arr1)).toBeTruthy();
+		expect(arr2.isProperSubsetOf(arr1)).toBeTruthy();
+		expect(arr1.isSupersetOf(arr2)).toBeTruthy();
+		expect(arr1.isProperSupersetOf(arr2)).toBeTruthy();
+		expect(arr3.isSubsetOf(arr1)).toBeFalsy();
+		expect(arr1.isSupersetOf(arr3)).toBeFalsy();
+	});
+
+	test("self", () => {
+		const arr = [1, 2, 3];
+		expect(arr.isSubsetOf(arr)).toBeTruthy();
+		expect(arr.isProperSubsetOf(arr)).toBeFalsy();
+		expect(arr.isSupersetOf(arr)).toBeTruthy();
+		expect(arr.isProperSupersetOf(arr)).toBeFalsy();
+	});
+
+	test("comparer", () => {
+		const arr1 = [1, 0, 1, 0, 1];
+		const arr2 = [19, 26, 8, 17];
+		const compare = (a: number, b: number) => (a & 1) - (b & 1);
+		expect(arr1.isSupersetOf(arr2, compare)).toBeTruthy();
+		expect(arr2.isProperSubsetOf(arr1, compare)).toBeTruthy();
+	});
+})
 
 describe("isAscending & isDescending", () => {
 	test("normal", () => {
