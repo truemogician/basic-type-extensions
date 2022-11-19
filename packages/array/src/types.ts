@@ -58,13 +58,13 @@ declare global {
 
 		/**
 		 * Calculates the summary of the array.
-		 * @param predicate Function used to map each element from `T` to `number`.  
+		 * @param predicate Function used to map each element from `T` to `number`. If omitted, `Number` will be used.
 		 */
 		sum(predicate?: (value: T) => number): number;
 
 		/**
-		 * Calculate the product of the array
-		 * @param predicate Function used to map each element from `T` to `number`.  
+		 * Calculates the product of the array
+		 * @param predicate Function used to map each element from `T` to `number`. If omitted, `Number` will be used.
 		 */
 		product(predicate?: (value: T) => number): number;
 

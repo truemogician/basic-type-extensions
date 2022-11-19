@@ -22,15 +22,6 @@ const keyOrderComparer = function <T>(...selectors: Selector<T>[]): Comparer<T> 
 	}
 };
 
-function toNumber(value: any): number {
-	switch (typeof value) {
-		case "number": return value
-		case "boolean": return Number(value)
-		case "string": return Number.parseFloat(value)
-		default: throw new Error(typeof value + " cannot be converted to number");
-	}
-}
-
 const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Array.prototype, K>) => e)({
 	last<T>(this: Array<T>, index: number = 0): T {
 		return this[this.length - index - 1];
@@ -77,14 +68,14 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 
 	sum<T>(this: Array<T>, predicate?: (value: T) => number): number {
 		let result = 0;
-		predicate ??= toNumber;
+		predicate ??= Number;
 		this.forEach(value => result += predicate!(value));
 		return result;
 	},
 
 	product<T>(this: Array<T>, predicate?: (value: T) => number): number {
 		let result = 1;
-		predicate ??= toNumber;
+		predicate ??= Number;
 		this.forEach(value => result *= predicate!(value));
 		return result;
 	},
