@@ -185,7 +185,7 @@ Object.clone = require("lodash.clonedeep");
 function cleanObject<T extends object>(src: T, param: CleanOption | ((key: string, value: any) => boolean), recursive: boolean, ancestors: object[]): PartialDeep<T> {
 	if (ancestors.includes(src))
 		return src as PartialDeep<T>;
-	if (typeof param == "function") {
+	if (typeof param == "function")
 		for (const key in src) {
 			const value = src[key];
 			if (param(key, value))
@@ -196,15 +196,14 @@ function cleanObject<T extends object>(src: T, param: CleanOption | ((key: strin
 				ancestors.pop();
 			}
 		}
-	}
-	else {
+	else
 		for (const key in src) {
 			const value = src[key];
 			if ((param & CleanOption.Null) && value === null)
 				delete src[key];
 			else if ((param & CleanOption.Undefined) && value === undefined)
 				delete src[key];
-			else if ((param & CleanOption.EmptyString) && value as any === "")
+			else if ((param & CleanOption.EmptyString) && value === "")
 				delete src[key];
 			else if (recursive && typeof value == "object") {
 				ancestors.push(src);
@@ -214,7 +213,6 @@ function cleanObject<T extends object>(src: T, param: CleanOption | ((key: strin
 					delete src[key];
 			}
 		}
-	}
 	return src as PartialDeep<T>;
 }
 
