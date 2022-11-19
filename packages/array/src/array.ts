@@ -4,11 +4,11 @@ import { version } from "../package.json";
 type Comparer<T> = (a: T, b: T) => number;
 type Selector<T, R = any> = (obj: T) => R;
 
-const defaultComparer = function <T>(a: T, b: T): number {
-	return a < b ? -1 : a > b ? 1 : 0;
-};
+const defaultComparer = <T>(a: T, b: T): number => a < b ? -1 : a > b ? 1 : 0;
 
-const keyOrderComparer = function <T>(...selectors: Selector<T>[]): Comparer<T> {
+function selectorsToComparer<T>(...selectors: Selector<T>[]): Comparer<T> {
+	if (selectors.length == 0)
+		return defaultComparer;
 	return (a, b) => {
 		for (const selector of selectors) {
 			const keyA = selector(a);
@@ -85,7 +85,7 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 			return undefined;
 		let compare: Comparer<T> = !func
 			? defaultComparer
-			: func.length == 2 ? func : keyOrderComparer(func as Selector<T>, ...keys);
+			: func.length == 2 ? func : selectorsToComparer(func as Selector<T>, ...keys);
 		let result = this[0];
 		for (let i = 1; i < this.length; ++i) {
 			if (compare(this[i], result) < 0)
@@ -99,7 +99,7 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 			return undefined;
 		let compare: Comparer<T> = !func
 			? defaultComparer
-			: func.length == 2 ? func : keyOrderComparer(func as Selector<T>, ...keys);
+			: func.length == 2 ? func : selectorsToComparer(func as Selector<T>, ...keys);
 		let result = this[0];
 		for (let i = 1; i < this.length; ++i) {
 			if (compare(this[i], result) > 0)
@@ -124,7 +124,7 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 	sortByKey<T>(this: Array<T>, ...keys: Selector<T>[]): T[] {
 		if (!this || this.length < 2)
 			return this;
-		const compare = keys?.length ? keyOrderComparer(...keys) : defaultComparer;
+		const compare = keys?.length ? selectorsToComparer(...keys) : defaultComparer;
 		return this.sort(compare);
 	},
 
@@ -141,7 +141,7 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 
 	repeat<T>(this: Array<T>, count: number = 1): T[] {
 		if (count < 0)
-			throw new Error("count must be greater than or equal to 0");
+			throw new Error("`count` must be greater than or equal to 0");
 		const result = new Array<T>(this.length * count);
 		for (let i = 0, j = 0; i < result.length; ++i, ++j) {
 			if (j == this.length)
@@ -151,13 +151,17 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 		return result;
 	},
 
-	intersects<T>(this: Array<T>, array: Array<T>): boolean {
-		const tmp1 = [...this].sort(defaultComparer);
-		const tmp2 = [...array].sort(defaultComparer);
+	intersects<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
+		if (!this?.length || !array?.length)
+			return false;
+		comparer ??= defaultComparer;
+		const tmp1 = [...this].sort(comparer);
+		const tmp2 = [...array].sort(comparer);
 		for (let i = 0, j = 0; i < tmp1.length && j < tmp2.length;) {
-			if (tmp1[i] == tmp2[j])
+			const cmp = comparer(tmp1[i], tmp2[j]);
+			if (cmp == 0)
 				return true;
-			if (i < tmp1.length && (j >= tmp2.length || tmp1[i] < tmp2[j]))
+			if (cmp < 0)
 				++i;
 			else
 				++j;
@@ -165,10 +169,52 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 		return false;
 	},
 
+	isSubsetOf<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
+		if (this.length > array.length)
+			return false;
+		comparer ??= defaultComparer;
+		const tmp1 = [...this].sort(comparer);
+		const tmp2 = [...array].sort(comparer);
+		let i: number, j: number;
+		for (i = 0, j = 0; i < tmp1.length && j < tmp2.length; ++j) {
+			const cmp = comparer(tmp1[i], tmp2[j]);
+			if (cmp < 0)
+				return false;
+			if (cmp == 0)
+				++i;
+		}
+		return i == tmp1.length;
+	},
+
+	isProperSubsetOf<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
+		if (this.length >= array.length)
+			return false;
+		comparer ??= defaultComparer;
+		const tmp1 = [...this].sort(comparer);
+		const tmp2 = [...array].sort(comparer);
+		let i: number, j: number;
+		for (i = 0, j = 0; i < tmp1.length && j < tmp2.length; ++j) {
+			const cmp = comparer(tmp1[i], tmp2[j]);
+			if (cmp < 0)
+				return false;
+			if (cmp == 0)
+				++i;
+		}
+		return i == tmp1.length;
+	},
+
+	isSupersetOf<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
+		return extensions.isSubsetOf.call(array, this, comparer);
+	},
+
+	isProperSupersetOf<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
+		return extensions.isProperSubsetOf.call(array, this, comparer);
+	},
+
 	isAscending<T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]): boolean {
 		let compare: Comparer<T> = !func
 			? defaultComparer
-			: func.length == 2 ? func : keyOrderComparer(func as Selector<T>, ...keys);
+			: func.length == 2 ? func : selectorsToComparer(func as Selector<T>, ...keys);
 		for (let i = 1; i < this.length; ++i)
 			if (compare(this[i - 1], this[i]) > 0)
 				return false;
@@ -178,7 +224,7 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 	isDescending<T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]): boolean {
 		let compare: Comparer<T> = !func
 			? defaultComparer
-			: func.length == 2 ? func : keyOrderComparer(func as Selector<T>, ...keys);
+			: func.length == 2 ? func : selectorsToComparer(func as Selector<T>, ...keys);
 		for (let i = 1; i < this.length; ++i)
 			if (compare(this[i - 1], this[i]) < 0)
 				return false;
@@ -270,7 +316,7 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 	binarySearchByKey<T>(this: Array<T>, value: T, param1?: Selector<T> | "upper" | "lower", ...param2: Selector<T>[]): number {
 		const bound = typeof param1 == "string" ? param1 : "lower";
 		const selectors = typeof param1 == "function" ? [param1, ...param2] : param2;
-		return this.binarySearch(value, bound, keyOrderComparer(...selectors));
+		return this.binarySearch(value, bound, selectorsToComparer(...selectors));
 	},
 
 	ternarySearch<T>(this: Array<T>, param1?: Comparer<T> | "upper" | "lower", param2?: Comparer<T>): number {
@@ -312,7 +358,7 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 	ternarySearchByKey<T>(this: Array<T>, param1?: Selector<T> | "upper" | "lower", ...param2: Selector<T>[]): number {
 		const bound = typeof param1 == "string" ? param1 : "lower";
 		const selectors = typeof param1 == "function" ? [param1, ...param2] : param2;
-		return this.ternarySearch(bound, keyOrderComparer(...selectors));
+		return this.ternarySearch(bound, selectorsToComparer(...selectors));
 	},
 });
 

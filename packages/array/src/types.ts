@@ -24,11 +24,9 @@ declare global {
 
 		/**
 		 * Calculates the minimum value of the array.
-		 * @param compareFn Function used to determine the order of the elements. It is expected to return
-		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
-		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
-		 * ```ts
-		 * [11,2,22,1].sort((a, b) => a - b)
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
 		 * ```
 		 */
 		minimum(compareFn?: (a: T, b: T) => number): T;
@@ -41,11 +39,9 @@ declare global {
 
 		/**
 		 * Calculates the maximum value of the array.
-		 * @param compareFn Function used to determine the order of the elements. It is expected to return
-		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
-		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
-		 * ```ts
-		 * [11,2,22,1].sort((a, b) => a - b)
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
 		 * ```
 		 */
 		maximum(compareFn?: (a: T, b: T) => number): T;
@@ -84,16 +80,58 @@ declare global {
 		/**
 		 * Checks whether the array has common elements with another.
 		 * @param array Another array.
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
+		 * ```
 		 */
-		intersects(array: Array<T>): boolean;
+		intersects(array: Array<T>, compareFn?: (a: T, b: T) => number): boolean;
+
+		/**
+		 * Checks whether the current array is a subset of another.
+		 * @param array Another array.
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
+		 * ```
+		 */
+		isSubsetOf(array: Array<T>, compareFn?: (a: T, b: T) => number): boolean;
+
+		/**
+		 * Checks whether the current array is a proper subset of another.
+		 * @param array Another array.
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
+		 * ```
+		 */
+		isProperSubsetOf(array: Array<T>, compareFn?: (a: T, b: T) => number): boolean;
+
+		/**
+		 * Checks whether the current array is a superset of another.
+		 * @param array Another array.
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
+		 * ```
+		 */
+		isSupersetOf(array: Array<T>, compareFn?: (a: T, b: T) => number): boolean;
+
+		/**
+		 * Checks whether the current array is a proper superset of another.
+		 * @param array Another array.
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
+		 * ```
+		 */
+		isProperSupersetOf(array: Array<T>, compareFn?: (a: T, b: T) => number): boolean;
 
 		/**
 		 * Checks whether the array is in ascending order.
-		 * @param compareFn Function used to determine the order of the elements. It is expected to return
-		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
-		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
-		 * ```ts
-		 * [11,2,22,1].sort((a, b) => a - b)
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
 		 * ```
 		 */
 		isAscending(compareFn?: (a: T, b: T) => number): boolean;
@@ -106,11 +144,9 @@ declare global {
 
 		/**
 		 * Checks whether the array is in descending order.
-		 * @param compareFn Function used to determine the order of the elements. It is expected to return
-		 * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
-		 * value otherwise. If omitted, the elements are sorted in ascending, ASCII character order.
-		 * ```ts
-		 * [11,2,22,1].sort((a, b) => a - b)
+		 * @param compareFn Function used to compare two elements. If omitted, the following default comparer will be used:
+		 * ```js
+		 * const defaultComparer = (a, b) => a < b ? -1 : a > b ? 1 : 0
 		 * ```
 		 */
 		isDescending(compareFn?: (a: T, b: T) => number): boolean;
