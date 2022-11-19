@@ -1,6 +1,8 @@
 .vscode
 coverage
 lib
+bin
+dist
 node_modules
 *.js
 !*.config.js
