@@ -15,7 +15,12 @@ const config: RestructurerConfig = {
 			delete: [
 				"src",
 				"package.json"
-			]
+			],
+			transform: ["array.js.map", content => {
+				const json = JSON.parse(content.toString("utf-8")) as { sources: string[] };
+				json.sources = json.sources.map(source => source.replace(/^\.\.[\/\\]/, ""));
+				return JSON.stringify(json);
+			}]
 		}
 	]
 };
