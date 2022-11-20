@@ -1,33 +1,44 @@
 import Path from "path";
 import AsyncFs from "node:fs/promises";
-import type { RestructurerConfig, StructureOperation } from "./types";
+import {
+	isStringPair, isTransformPair,
+	type RestructurerConfig, type StructureOperation
+} from "./types";
 
 export default async function restructure(config: RestructurerConfig) {
 	async function process(operation: StructureOperation) {
-		if (operation.copy)
-			await Promise.all(operation.copy.map(async ([src, dst]) => {
+		let { copy, move, delete: del, transform } = operation;
+		if (copy?.length) {
+			copy = isStringPair(copy) ? [copy] : copy;
+			await Promise.all(copy.map(async ([src, dst]) => {
 				const srcPath = Path.resolve(config.root, src);
 				await AsyncFs.access(srcPath);
 				const dstPath = Path.resolve(config.root, dst);
 				await AsyncFs.mkdir(Path.dirname(dstPath), { recursive: true });
 				await AsyncFs.copyFile(srcPath, dstPath);
 			}));
-		if (operation.move)
-			await Promise.all(operation.move.map(async ([src, dst]) => {
+		}
+		if (move) {
+			move = isStringPair(move) ? [move] : move;
+			await Promise.all(move.map(async ([src, dst]) => {
 				const srcPath = Path.resolve(config.root, src);
 				await AsyncFs.access(srcPath);
 				const dstPath = Path.resolve(config.root, dst);
 				await AsyncFs.mkdir(Path.dirname(dstPath), { recursive: true });
 				await AsyncFs.rename(srcPath, dstPath);
 			}));
-		if (operation.delete)
-			await Promise.all(operation.delete.map(async path => {
+		}
+		if (del) {
+			del = Array.isArray(del) ? del : [del];
+			await Promise.all(del.map(async path => {
 				path = Path.resolve(config.root, path);
 				await AsyncFs.access(path);
 				await AsyncFs.rm(path, { recursive: true });
 			}));
-		if (operation.transform)
-			await Promise.all(operation.transform.map(async ([path, transform]) => {
+		}
+		if (transform) {
+			transform = isTransformPair(transform) ? [transform] : transform;
+			await Promise.all(transform.map(async ([path, transform]) => {
 				path = Path.resolve(config.root, path);
 				await AsyncFs.access(path);
 				const content = await AsyncFs.readFile(path);
@@ -35,6 +46,7 @@ export default async function restructure(config: RestructurerConfig) {
 				if (transformed !== content)
 					await AsyncFs.writeFile(path, transformed);
 			}));
+		}
 	}
 	const operations = Array.isArray(config.operations) ? config.operations : [config.operations];
 	for (const operation of operations)

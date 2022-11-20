@@ -1,6 +1,6 @@
 {
 	"name": "@basic-type-extensions/tools",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"private": true,
 	"description": "Tools used for building basic-type-extension packages.",
 	"main": "dist/index.js",

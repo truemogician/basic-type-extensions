@@ -1,11 +1,13 @@
+type OrArray<T> = T | T[];
+
 export interface StructureOperation {
-	copy?: [source: string, destination: string][];
+	copy?: OrArray<[source: string, destination: string]>;
 
-	move?: [source: string, destination: string][];
+	move?: OrArray<[source: string, destination: string]>;
 
-	delete?: string[];
+	delete?: string | string[];
 
-	transform?: [source: string, transform: (content: Buffer) => string | Buffer | Promise<string | Buffer>][];
+	transform?: OrArray<[source: string, transform: (content: Buffer) => string | Buffer | Promise<string | Buffer>]>;
 }
 
 export interface RestructurerConfig {
@@ -14,24 +16,24 @@ export interface RestructurerConfig {
 	operations: StructureOperation | StructureOperation[];
 }
 
-function isStringPair(pair: any): pair is [string, string] {
+export function isStringPair(pair: any): pair is [string, string] {
 	return Array.isArray(pair) && pair.length == 2 && typeof pair[0] == "string" && typeof pair[1] == "string";
 }
 
-function isTransformPair(pair: any): pair is [string, (content: Buffer) => string | Buffer | Promise<string | Buffer>] {
+export function isTransformPair(pair: any): pair is [string, (content: Buffer) => string | Buffer | Promise<string | Buffer>] {
 	return Array.isArray(pair) && pair.length == 2 && typeof pair[0] == "string" && typeof pair[1] == "function";
 }
 
 export function isStructureOperation(config: any): config is StructureOperation {
 	if (config != null && typeof config == "object") {
 		const { copy, move, delete: del, transform } = config;
-		if (copy != null && (!Array.isArray(copy) || !copy.every(isStringPair)))
+		if (copy != null && (!Array.isArray(copy) || !(isStringPair(copy) || copy.every(isStringPair))))
 			return false;
-		if (move != null && (!Array.isArray(move) || !move.every(isStringPair)))
+		if (move != null && (!Array.isArray(move) || !(isStringPair(move) || move.every(isStringPair))))
 			return false;
-		if (del != null && (!Array.isArray(del) || !del.every(path => typeof path == "string")))
+		if (del != null && !(typeof del == "string" || (Array.isArray(del) && del.every(path => typeof path == "string"))))
 			return false;
-		if (transform != null && (!Array.isArray(transform) || !transform.every(isTransformPair)))
+		if (transform != null && (!Array.isArray(transform) || !(isTransformPair(transform) || transform.every(isTransformPair))))
 			return false;
 		return true;
 	}
