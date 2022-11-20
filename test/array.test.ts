@@ -181,7 +181,13 @@ describe("intersects", () => {
 	test("empty", () => {
 		expect(arrays[0].intersects([])).toBeFalsy();
 		expect([].intersects([])).toBeFalsy();
-	})
+	});
+
+	test("single element", () => {
+		const arr = [0, 1, 2, 3, 4];
+		expect(arr.intersects([0])).toBeTruthy();
+		expect(arr.intersects([5])).toBeFalsy();
+	});
 });
 
 describe("subset and superset", () => {
@@ -203,6 +209,14 @@ describe("subset and superset", () => {
 		expect(arr.isProperSubsetOf(arr)).toBeFalsy();
 		expect(arr.isSupersetOf(arr)).toBeTruthy();
 		expect(arr.isProperSupersetOf(arr)).toBeFalsy();
+	});
+
+	test("single element", () => {
+		const arr = [0, 1, 2, 3, 4];
+		expect(arr.isSupersetOf([0])).toBeTruthy();
+		expect(arr.isSubsetOf([5])).toBeFalsy();
+		expect([0].isSubsetOf(arr)).toBeTruthy();
+		expect([5].isSupersetOf(arr)).toBeFalsy();
 	});
 
 	test("comparer", () => {
