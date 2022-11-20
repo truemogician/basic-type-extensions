@@ -2,7 +2,7 @@ import Yargs from "yargs";
 import FileSystem from "fs";
 import Path from "path";
 import restructure from "./main";
-import { loadModule } from "../utils";
+import { loadModule } from "../loader";
 import { isRestructurerConfig, type RestructurerConfig } from "./types";
 
 const command: Yargs.CommandModule = {
