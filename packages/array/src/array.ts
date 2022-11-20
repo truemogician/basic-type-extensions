@@ -22,6 +22,41 @@ function selectorsToComparer<T>(...selectors: Selector<T>[]): Comparer<T> {
 	}
 };
 
+function isSubset<T>(arr1: T[], arr2: T[], proper: boolean, comparer?: Comparer<T>): boolean {
+	if (arr1.length > arr2.length || (proper && arr1.length == arr2.length))
+		return false;
+	if (arr1.length == 0)
+		return true;
+	comparer ??= defaultComparer;
+	const [n, m] = [arr1.length, arr2.length];
+	// Compare the complexity, and use the faster one
+	if (n * m < n * Math.log2(n) + m * Math.log2(m)) {
+		const matched = new Array<boolean>(m);
+		for (let i = 0; i < n; ++i) {
+			let found = false;
+			for (let j = 0; j < m; ++j)
+				if (!matched[j] && comparer(arr1[i], arr2[j]) == 0) {
+					matched[j] = true;
+					found = true;
+					break;
+				}
+			if (!found)
+				return false;
+		}
+	}
+	const a = [...arr1].sort(comparer);
+	const b = [...arr2].sort(comparer);
+	let i: number, j: number;
+	for (i = 0, j = 0; i < a.length && j < b.length; ++j) {
+		const cmp = comparer(a[i], b[j]);
+		if (cmp < 0)
+			return false;
+		if (cmp == 0)
+			++i;
+	}
+	return i == a.length;
+}
+
 const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Array.prototype, K>) => e)({
 	last<T>(this: Array<T>, index: number = 0): T {
 		return this[this.length - index - 1];
@@ -155,10 +190,15 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 		if (!this?.length || !array?.length)
 			return false;
 		comparer ??= defaultComparer;
-		const tmp1 = [...this].sort(comparer);
-		const tmp2 = [...array].sort(comparer);
-		for (let i = 0, j = 0; i < tmp1.length && j < tmp2.length;) {
-			const cmp = comparer(tmp1[i], tmp2[j]);
+		let [a, b] = this.length <= array.length ? [this, array] : [array, this];
+		const [n, m] = [a.length, b.length];
+		// Compare the complexity, and use the faster one
+		if (n * m < n * Math.log2(n) + m * Math.log2(m))
+			return a.some(x => b.findIndex(y => comparer!(x, y) == 0) !== -1);
+		a = [...a].sort(comparer);
+		b = [...b].sort(comparer);
+		for (let i = 0, j = 0; i < a.length && j < b.length;) {
+			const cmp = comparer(a[i], b[j]);
 			if (cmp == 0)
 				return true;
 			if (cmp < 0)
@@ -170,45 +210,19 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 	},
 
 	isSubsetOf<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
-		if (this.length > array.length)
-			return false;
-		comparer ??= defaultComparer;
-		const tmp1 = [...this].sort(comparer);
-		const tmp2 = [...array].sort(comparer);
-		let i: number, j: number;
-		for (i = 0, j = 0; i < tmp1.length && j < tmp2.length; ++j) {
-			const cmp = comparer(tmp1[i], tmp2[j]);
-			if (cmp < 0)
-				return false;
-			if (cmp == 0)
-				++i;
-		}
-		return i == tmp1.length;
+		return isSubset(this, array, false, comparer);
 	},
 
 	isProperSubsetOf<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
-		if (this.length >= array.length)
-			return false;
-		comparer ??= defaultComparer;
-		const tmp1 = [...this].sort(comparer);
-		const tmp2 = [...array].sort(comparer);
-		let i: number, j: number;
-		for (i = 0, j = 0; i < tmp1.length && j < tmp2.length; ++j) {
-			const cmp = comparer(tmp1[i], tmp2[j]);
-			if (cmp < 0)
-				return false;
-			if (cmp == 0)
-				++i;
-		}
-		return i == tmp1.length;
+		return isSubset(this, array, true, comparer);
 	},
 
 	isSupersetOf<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
-		return extensions.isSubsetOf.call(array, this, comparer);
+		return isSubset(array, this, false, comparer);
 	},
 
 	isProperSupersetOf<T>(this: Array<T>, array: Array<T>, comparer?: Comparer<T>): boolean {
-		return extensions.isProperSubsetOf.call(array, this, comparer);
+		return isSubset(array, this, true, comparer);
 	},
 
 	isAscending<T>(this: Array<T>, func?: Comparer<T> | Selector<T>, ...keys: Selector<T>[]): boolean {
