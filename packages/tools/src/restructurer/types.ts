@@ -18,6 +18,10 @@ function isStringPair(pair: any): pair is [string, string] {
 	return Array.isArray(pair) && pair.length == 2 && typeof pair[0] == "string" && typeof pair[1] == "string";
 }
 
+function isTransformPair(pair: any): pair is [string, (content: Buffer) => string | Buffer | Promise<string | Buffer>] {
+	return Array.isArray(pair) && pair.length == 2 && typeof pair[0] == "string" && typeof pair[1] == "function";
+}
+
 export function isStructureOperation(config: any): config is StructureOperation {
 	if (config != null && typeof config == "object") {
 		const { copy, move, delete: del, transform } = config;
@@ -27,14 +31,7 @@ export function isStructureOperation(config: any): config is StructureOperation 
 			return false;
 		if (del != null && (!Array.isArray(del) || !del.every(path => typeof path == "string")))
 			return false;
-		if (transform != null &&
-			(!Array.isArray(transform) ||
-				transform.length != 2 ||
-				typeof transform[0] != "string" ||
-				typeof transform[1] != "function" ||
-				transform[1].length != 1
-			)
-		)
+		if (transform != null && (!Array.isArray(transform) || !transform.every(isTransformPair)))
 			return false;
 		return true;
 	}
