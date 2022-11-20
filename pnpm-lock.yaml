@@ -4,7 +4,7 @@ importers:
 
   .:
     specifiers:
-      '@basic-type-extensions/array': ^1.3.0
+      '@basic-type-extensions/array': ^1.3.1
       '@basic-type-extensions/array-constructor': ^1.0.2
       '@basic-type-extensions/math': ^1.0.2
       '@basic-type-extensions/object-constructor': ^2.0.0
