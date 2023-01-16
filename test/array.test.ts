@@ -94,6 +94,12 @@ describe("removeAt", () => {
 	});
 });
 
+test("removeBy", () => {
+	const arr = [0, 1, 2, 3, 4];
+	expect(arr.removeBy(num => (num & 1) == 0)).toBe(3);
+	expect(arr).toStrictEqual([1, 3]);
+});
+
 describe("sum", () => {
 	test("default", () => expect([true, 2, "3"].sum()).toBe(6));
 
