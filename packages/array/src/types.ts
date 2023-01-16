@@ -340,7 +340,7 @@ declare global {
 		/**
 		 * Removes all items that equals to any `values` from an array.
 		 * @param values Values to remove.
-		 * @returns The number of items removed
+		 * @returns The number of items removed.
 		 */
 		remove(...values: T[]): number;
 
@@ -357,6 +357,13 @@ declare global {
 		 * @returns Whether all items are successfully removed.
 		 */
 		removeAt(...indices: number[]): boolean;
+
+		/**
+		 * Removes all items that satisfy the predicate from an array.
+		 * @param predicate Function used to test whether an item should be removed.
+		 * @returns The number of items removed.
+		 */
+		removeBy(predicate: (value: T, index: number, array: T[]) => boolean): number;
 
 		/**
 		 * Sorts the array in place by keys provided by a series of key selector functions.

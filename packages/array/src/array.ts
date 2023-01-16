@@ -101,6 +101,15 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 		return true;
 	},
 
+	removeBy<T>(this: Array<T>, predicate: (value: T, index: number, array: T[]) => boolean): number {
+		const indices = new Array<number>();
+		for (let i = 0; i < this.length; ++i)
+			if (predicate(this[i], i, this))
+				indices.push(i);
+		this.removeAt(...indices);
+		return indices.length;
+	},
+
 	sum<T>(this: Array<T>, predicate?: (value: T) => number): number {
 		let result = 0;
 		predicate ??= Number;

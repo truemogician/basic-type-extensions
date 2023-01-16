@@ -1,6 +1,6 @@
 {
 	"name": "@basic-type-extensions/array",
-	"version": "1.3.1",
+	"version": "1.4.0",
 	"description": "Useful extensions for Array and ReadonlyArray.",
 	"main": "lib/array.js",
 	"types": "lib/types.d.ts",
