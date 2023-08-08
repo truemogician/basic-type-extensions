@@ -254,28 +254,30 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 		return true;
 	},
 
-	forEachAsync<T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any, options?: AsyncOptions): Promise<void> {
+	forEachAsync<T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => void | PromiseLike<void>, thisArg?: any, options?: AsyncOptions): Promise<void> {
 		if (this.length == 0)
 			return Promise.resolve();
 		const maxConcurrency = options?.maxConcurrency ?? 0;
+		function getStatus(promisable: ReturnType<typeof callbackfn>) {
+			if (typeof promisable != "object" || !("then" in promisable))
+				return true;
+			return promisable.then(
+				() => true as const,
+				error => ({ error })
+			)
+		}
 		return new Promise((resolve, reject) => {
 			let finished = 0;
-			const getStatus = (promise: Promise<unknown>) =>
-				promise.then(
-					() => true,
-					error => {
-						reject(error);
-						return false;
-					}
-				);
 			if (maxConcurrency >= 1 && this.length > maxConcurrency) {
 				let index = 0;
 				const execute = async () => {
 					const idx = index++;
 					if (idx >= this.length)
 						return;
-					const success = await getStatus(callbackfn.call(thisArg, this[idx], idx, this));
-					if (success) {
+					const status = await getStatus(callbackfn.call(thisArg, this[idx], idx, this));
+					if (status !== true)
+						reject(status.error);
+					else {
 						++finished;
 						if (finished == this.length)
 							resolve();
@@ -288,9 +290,11 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 			}
 			else {
 				this.forEach(async (value, index, array) => {
-					const success = await getStatus(callbackfn(value, index, array));
-					if (!success)
+					const status = await getStatus(callbackfn(value, index, array));
+					if (status !== true) {
+						reject(status.error);
 						return;
+					}
 					++finished;
 					if (finished == this.length)
 						resolve();
@@ -299,7 +303,7 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 		});
 	},
 
-	mapAsync<T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]> {
+	mapAsync<T, TResult>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => TResult | PromiseLike<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]> {
 		const results = new Array<TResult>(this.length);
 		return new Promise((resolve, reject) => {
 			this.forEachAsync(async (value, index, array) => {

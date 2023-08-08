@@ -163,7 +163,7 @@ declare global {
 		 * @param thisArg  An object to which the this keyword can refer in `callbackfn`. If `thisArg` is omitted, `undefined` is used as `this`.
 		 * @param options Asynchronous operation options.
 		 */
-		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => Promise<any>, thisArg?: any, options?: AsyncOptions): Promise<void>
+		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => void | PromiseLike<void>, thisArg?: any, options?: AsyncOptions): Promise<void>
 
 		/**
 		 * Calls a defined asynchronous callback function on each element of an array, and returns an array that contains the results.
@@ -171,7 +171,7 @@ declare global {
 		 * @param thisArg  An object to which the this keyword can refer in `callbackfn`. If `thisArg` is omitted, `undefined` is used as `this`.
 		 * @param options Asynchronous operation options.
 		 */
-		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => Promise<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]>
+		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => TResult | PromiseLike<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]>
 
 		/**
 		 * Searches for the index of a specific value in an **ordered** array.

@@ -1,12 +1,12 @@
 {
 	"name": "@basic-type-extensions/array",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"description": "Useful extensions for Array and ReadonlyArray.",
 	"main": "lib/array.js",
 	"types": "lib/types.d.ts",
 	"scripts": {
 		"build": "tsc && pnpm exec -- tools restructure ./restructurer.config.ts",
-		"prepublishOnly": "npm run build"
+		"prepublishOnly": "pnpm run build"
 	},
 	"author": "true_mogician",
 	"license": "MIT",
