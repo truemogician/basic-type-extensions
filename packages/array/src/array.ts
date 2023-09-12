@@ -387,6 +387,20 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 		const selectors = typeof param1 == "function" ? [param1, ...param2] : param2;
 		return this.ternarySearch(bound, selectorsToComparer(...selectors));
 	},
+
+	unique<T>(this: Array<T>, comparer?: Selector<T>): T[] {
+		const set = new Set<any>();
+		const indices = new Array<number>();
+		for (let i = 0; i < this.length; ++i) {
+			const key = comparer ? comparer(this[i]) : this[i];
+			if (set.has(key))
+				indices.push(i);
+			else
+				set.add(key);
+		}
+		this.removeAt(...indices);
+		return this;
+	}
 });
 
 function extend(existing: "skip" | "override" | "throw" = "throw"): void {

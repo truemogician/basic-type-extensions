@@ -376,5 +376,18 @@ declare global {
 		 * @return A reference to the array.
 		 */
 		shuffle(): T[];
+
+		/**
+		 * Removes duplicate items from an array.
+		 * @returns The array itself.
+		 */
+		unique(): T[];
+
+		/**
+		 * Removes duplicate items from an array.
+		 * @param selector A key selector function.
+		 * @returns The array itself.
+		 */
+		unique(selector: (obj: T) => any): T[];
 	}
 }
