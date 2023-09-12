@@ -1,5 +1,7 @@
 /*
 !/lib
 /lib/*.map
+/lib/math.d.ts
+/lib/type.js
 !LICENSE
 !package.json
