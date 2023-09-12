@@ -345,6 +345,19 @@ describe("ternarySearch", () => {
 	});
 });
 
+describe("unique", () => {
+	const array = [3, 5, 6, 6, 2, 4, 5, 9, 3, 4, 6];
+	test("default", () => {
+		const arr = Object.copy(array);
+		expect(arr.unique()).toEqual([3, 5, 6, 2, 4, 9]);
+	});
+
+	test("selector", () => {
+		const arr = Object.copy(array);
+		expect(arr.unique(num => num % 3)).toEqual([3, 5, 4]);
+	})
+})
+
 describe("extension decriptors", () => {
 	test("enumerability", () => {
 		const arr = new Array<any>();
