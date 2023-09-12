@@ -22,3 +22,30 @@ test("randomFloat", () => {
 		expect(rand).toBeLessThanOrEqual(2);
 	}
 });
+
+describe("approximation", () => {
+	const number = 1234.5678;
+	test("roundTo", () => {
+		expect(Math.roundTo(number, 2)).toBeCloseTo(1234.57);
+		expect(Math.roundTo(number, 1)).toBeCloseTo(1234.6);
+		expect(Math.roundTo(number, 0)).toBeCloseTo(1235);
+		expect(Math.roundTo(number, -1)).toBeCloseTo(1230);
+		expect(Math.roundTo(number, -2)).toBeCloseTo(1200);
+	});
+
+	test("ceilTo", () => {
+		expect(Math.ceilTo(number, 2)).toBeCloseTo(1234.57);
+		expect(Math.ceilTo(number, 1)).toBeCloseTo(1234.6);
+		expect(Math.ceilTo(number, 0)).toBeCloseTo(1235);
+		expect(Math.ceilTo(number, -1)).toBeCloseTo(1240);
+		expect(Math.ceilTo(number, -2)).toBeCloseTo(1300);
+	});
+
+	test("floorTo", () => {
+		expect(Math.floorTo(number, 2)).toBeCloseTo(1234.56);
+		expect(Math.floorTo(number, 1)).toBeCloseTo(1234.5);
+		expect(Math.floorTo(number, 0)).toBeCloseTo(1234);
+		expect(Math.floorTo(number, -1)).toBeCloseTo(1230);
+		expect(Math.floorTo(number, -2)).toBeCloseTo(1200);
+	})
+})
