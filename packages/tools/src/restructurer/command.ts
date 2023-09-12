@@ -1,8 +1,8 @@
+import loadModule from "multilang-module-loader";
 import Yargs from "yargs";
-import FileSystem from "fs";
+import AsyncFs from "fs/promises";
 import Path from "path";
 import restructure from "./main";
-import { loadModule } from "../loader";
 import { isRestructurerConfig, type RestructurerConfig } from "./types";
 
 const command: Yargs.CommandModule = {
@@ -16,8 +16,7 @@ const command: Yargs.CommandModule = {
 				if (arg.startsWith("{"))
 					return JSON.parse(arg);
 				arg = Path.resolve(process.cwd(), arg);
-				if (!FileSystem.existsSync(arg))
-					throw new Error(`Config file ${arg} does not exist`);
+				await AsyncFs.access(arg);
 				return await loadModule(arg);
 			}
 		})

@@ -1,5 +1,5 @@
 import Path from "path";
-import AsyncFs from "node:fs/promises";
+import AsyncFs from "fs/promises";
 import {
 	isStringPair, isTransformPair,
 	type RestructurerConfig, type StructureOperation
