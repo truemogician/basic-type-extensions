@@ -1,6 +1,6 @@
 {
 	"name": "basic-type-extensions",
-	"version": "4.3.1",
+	"version": "4.4.0",
 	"description": "Some useful extensions for Javascript basic types with build-in Typescript support.",
 	"main": "lib/index.js",
 	"scripts": {
@@ -26,9 +26,9 @@
 		"typescript"
 	],
 	"dependencies": {
-		"@basic-type-extensions/array": "^1.4.1",
+		"@basic-type-extensions/array": "^1.5.0",
 		"@basic-type-extensions/array-constructor": "^1.0.2",
-		"@basic-type-extensions/math": "^1.0.2",
+		"@basic-type-extensions/math": "^1.1.0",
 		"@basic-type-extensions/object-constructor": "^2.0.0",
 		"@basic-type-extensions/promise-constructor": "^1.0.2",
 		"@basic-type-extensions/string-constructor": "^1.0.4"
