@@ -57,6 +57,10 @@ function isSubset<T>(arr1: T[], arr2: T[], proper: boolean, comparer?: Comparer<
 	return i == a.length;
 }
 
+function isPromiseLike(obj: any): obj is PromiseLike<any> {
+	return obj && typeof obj.then === "function" && typeof obj.catch === "function";
+}
+
 const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Array.prototype, K>) => e)({
 	last<T>(this: Array<T>, index: number = 0): T {
 		return this[this.length - index - 1];
@@ -255,50 +259,48 @@ const extensions = (<K extends keyof typeof Array.prototype>(e: Pick<typeof Arra
 	},
 
 	forEachAsync<T>(this: Array<T>, callbackfn: (value: T, index: number, array: T[]) => void | PromiseLike<void>, thisArg?: any, options?: AsyncOptions): Promise<void> {
-		if (this.length == 0)
+		if (this.length === 0)
 			return Promise.resolve();
 		const maxConcurrency = options?.maxConcurrency ?? 0;
-		function getStatus(promisable: ReturnType<typeof callbackfn>) {
-			if (typeof promisable != "object" || !("then" in promisable))
-				return true;
-			return promisable.then(
-				() => true as const,
-				error => ({ error })
-			)
-		}
+		if (!Number.isSafeInteger(maxConcurrency))
+			throw new Error("`maxConcurrency` must be a safe integer.");
+		const throttled = maxConcurrency > 0 && maxConcurrency < this.length;
+		thisArg ??= this;
 		return new Promise((resolve, reject) => {
 			let finished = 0;
-			if (maxConcurrency >= 1 && this.length > maxConcurrency) {
-				let index = 0;
-				const execute = async () => {
-					const idx = index++;
+			const errors = new Array<any>();
+			let globalIndex = 0;
+			const worker = async (index?: number) => {
+				do {
+					const idx = index === undefined ? globalIndex++ : index;
 					if (idx >= this.length)
 						return;
-					const status = await getStatus(callbackfn.call(thisArg, this[idx], idx, this));
-					if (status !== true)
-						reject(status.error);
-					else {
-						++finished;
-						if (finished == this.length)
-							resolve();
-						else
-							execute();
+					try {
+						const result = callbackfn.call(thisArg, this[idx], idx, this);
+						if (isPromiseLike(result))
+							await result;
 					}
-				}
-				for (let i = 0; i < maxConcurrency; ++i)
-					execute();
-			}
-			else {
-				this.forEach(async (value, index, array) => {
-					const status = await getStatus(callbackfn(value, index, array));
-					if (status !== true) {
-						reject(status.error);
+					catch (error) {
+						errors.push(error);
 						return;
 					}
-					++finished;
-					if (finished == this.length)
+					finally {
+						++finished;
+					}
+				} while (index === undefined && finished < this.length && errors.length === 0);
+			}
+			const iteration = throttled ? maxConcurrency : this.length;
+			let concurrency = iteration;
+			for (let i = 0; i < iteration; ++i) {
+				const promise = throttled ? worker() : worker(i);
+				promise.then(() => {
+					if (--concurrency > 0)
+						return;
+					if (errors.length === 0)
 						resolve();
-				}, thisArg)
+					else
+						reject(new AggregateError(errors, "Errors occurred during async forEach."));
+				});
 			}
 		});
 	},

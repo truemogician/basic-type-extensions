@@ -162,6 +162,7 @@ declare global {
 		 * @param callbackfn  An asynchronous function that accepts up to three arguments. `forEachAsync` calls `callbackfn` one time for each element in the array.
 		 * @param thisArg  An object to which the this keyword can refer in `callbackfn`. If `thisArg` is omitted, `undefined` is used as `this`.
 		 * @param options Asynchronous operation options.
+		 * @throws {AggregateError} If `callbackfn` throws error for one or more elements, an `AggregateError` is thrown containing all errors.
 		 */
 		forEachAsync(callbackfn: (value: T, index: number, array: T[]) => void | PromiseLike<void>, thisArg?: any, options?: AsyncOptions): Promise<void>
 
@@ -170,6 +171,7 @@ declare global {
 		 * @param callbackfn  An asynchronous function that accepts up to three arguments. `forEachAsync` calls `callbackfn` one time for each element in the array.
 		 * @param thisArg  An object to which the this keyword can refer in `callbackfn`. If `thisArg` is omitted, `undefined` is used as `this`.
 		 * @param options Asynchronous operation options.
+		 * @throws {AggregateError} If `callbackfn` throws error for one or more elements, an `AggregateError` is thrown containing all errors.
 		 */
 		mapAsync<TResult>(callbackfn: (value: T, index: number, array: T[]) => TResult | PromiseLike<TResult>, thisArg?: any, options?: AsyncOptions): Promise<TResult[]>
 
